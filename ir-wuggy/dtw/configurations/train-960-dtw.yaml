@@ -1,0 +1,6 @@
+trainPath: /pio/data/zerospeech2021/quantized/LibriSpeech/train-full-960
+testPath: /pio/data/zerospeech2021/quantized/lexical/dev-big-no-oov
+outPath: /pio/scratch/1/i290956/zs2021/output/lexical/train-full-960/dtw/dev
+method:
+  name: 'dtw'
+saveEvery: 100
