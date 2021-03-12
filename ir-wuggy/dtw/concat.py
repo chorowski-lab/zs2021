@@ -13,8 +13,10 @@ def parseArgs():
 
     parser.add_argument('--k', type=int,
                         help='Parameter for the "first_k" method.')
-    parser.add_argument('--n', type=int, default=20,
+    parser.add_argument('--n', type=int, 
                         help='Number of the dev-i files. Default: 20')
+    parser.add_argument('--q', type=int, 
+                        help='Parameter for the "min_x" method.')
 
     return parser.parse_args()
 
@@ -49,12 +51,13 @@ def _sum(desc):
     r = {int(x.split(':')[0]): int(x.split(':')[1]) for x in d.split(',') }
     return - sum(k * v for k, v in sorted(r.items()))
 
-def _x_min(desc):
-    r = desc[1:-1].split(',')
-    # return - float(r[0])
-    # return - float(r[0]) + float(r[-1])
-    return - float(r[0]) / float(r[-1])
-    # return eval(desc)[0]
+def _x_min(args, dtoi):
+    k = dtoi[args.q] if dtoi is not None else args.q
+    def f(desc):
+        r = desc[1:-1].split(',')
+        return - float(r[0]) / float(r[k])
+    return f
+
 
 def main(args):
     try:
@@ -124,15 +127,31 @@ def main(args):
 
         elif variant == 'dtw-x':
             
+            dtoi = None
+            if '!info.txt' in listdir(args.data):
+                print('Found !info.txt file, loading')
+                dtoi = dict()
+                i = 0
+                for line in open(f'{args.data}/!info.txt', 'r'):
+                    if line.strip().find('-') != -1:
+                        a, b = map(int, line.strip().split('-'))
+                        for q in range(a, b+1):
+                            dtoi[q] = i
+                            i += 1
+                    else:
+                        dtoi[int(line.strip())] = i
+                        i += 1
+
             method = None
 
             if args.method == 'min':
-                method = _x_min
+                method = _x_min(args, dtoi)
             
             if method is None:
                 raise ValueError('invalid "method" parameter, must be min')
 
             print(f'Using method: {args.method}')
+
             with open('./output/lexical/dev.txt', 'w', encoding='utf8') as out: 
                 for i in range(1, n+1):
                     for line in open(f'{args.data}/dev-{i}', 'r'):

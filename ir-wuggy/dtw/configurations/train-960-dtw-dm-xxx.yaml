@@ -1,0 +1,31 @@
+trainPath: /pio/data/zerospeech2021/quantized/LibriSpeech/train-full-960
+testPath: /pio/data/zerospeech2021/quantized/lexical/dev-big-no-oov
+outPath: /pio/scratch/1/i290956/zs2021/output/lexical/train-full-960/dtw-dm-xxx/dev
+method:
+  name: 'dtw'
+  distMatrix: /pio/scratch/1/i290956/zs2021/quantized/ppusz/distMatrix.txt
+  extended:
+    - 600
+    - 700
+    - 800
+    - 900
+    - 1000
+    - 1500
+    - 2000
+    - 3000
+    - 4000
+    - 5000
+    - 10000
+    - 20000
+    - 30000
+    - 40000
+    - 50000
+    - 100000
+    - 110000
+    - 120000
+    - 130000
+    - 140000
+    - 150000
+    - 160000
+    - 200000
+saveEvery: 1000 

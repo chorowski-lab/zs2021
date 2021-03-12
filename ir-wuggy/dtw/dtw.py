@@ -6,6 +6,7 @@ from collections import defaultdict
 from more_itertools import pairwise, grouper
 from numba import njit, prange
 import numpy as np
+import os
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Compute the pseudo log-proba of a list of sentences')
@@ -149,11 +150,15 @@ def run(config, method, testset, trainset):
     bar.start()
     i = 0
     for si, subset in enumerate(grouper(testset, config['saveEvery'])):
-        with open(config["outPath"]+ '-' + str(si+1), 'w') as out:
-            for index, (fname, seq) in enumerate(subset):
-                bar.update(si*config['saveEvery']+index)
-                res = method(seq, trainset.data, trainset.lengths, trainset.n)
-                out.write(f'{fname} {list_to_str(res)}\n')
+        path = config["outPath"]+ '-' + str(si+1)
+        if os.path.exists(path):
+            print(f'File {path} already exists, skipping')
+        else:
+            with open(path, 'w') as out:
+                for index, (fname, seq) in enumerate(subset):
+                    bar.update(si*config['saveEvery']+index)
+                    res = method(seq, trainset.data, trainset.lengths, trainset.n)
+                    out.write(f'{fname} {list_to_str(res)}\n')
     bar.finish()
 
 
@@ -161,15 +166,20 @@ def extended_run(config, ext_depth, method, testset, trainset):
     bar = ProgressBar(maxval=len(testset))
     bar.start()
     i = 0
+    indices = slice(ext_depth) if isinstance(ext_depth, int) else ext_depth
     for si, subset in enumerate(grouper(testset, config['saveEvery'])):
-        with open(config["outPath"]+ '-' + str(si+1), 'w') as out:
-            for index, (fname, seq) in enumerate(subset):
-                bar.update(si*config['saveEvery']+index)
-                res = method(seq, trainset.data, trainset.lengths, trainset.n)
-                I = np.argsort(res)
-                rs = list(res[I[:ext_depth]]).__str__().replace(' ', '')
-                fs = list(trainset.filenames[I[:ext_depth]]).__str__().replace(' ', '')
-                out.write(f'{fname} {rs} {fs}\n')
+        path = config["outPath"]+ '-' + str(si+1)
+        if os.path.exists(path):
+            print(f'File {path} already exists, skipping')
+        else:
+            with open(path, 'w') as out:
+                for index, (fname, seq) in enumerate(subset):
+                    bar.update(si*config['saveEvery']+index)
+                    res = method(seq, trainset.data, trainset.lengths, trainset.n)
+                    I = np.argsort(res)
+                    rs = list(res[I[indices]]).__str__().replace(' ', '')
+                    fs = list(trainset.filenames[I[indices]]).__str__().replace(' ', '')
+                    out.write(f'{fname} {rs} {fs}\n')
     bar.finish()
 
 
@@ -191,8 +201,8 @@ def main(args, config):
 
     method = dtw(config['method'])
 
-    if 'extended' in config:
-        extended_run(config, config['extended'], method, test, train)
+    if 'extended' in config['method']:
+        extended_run(config, config['method']['extended'], method, test, train)
     else:
         run(config, method, test, train)
 
