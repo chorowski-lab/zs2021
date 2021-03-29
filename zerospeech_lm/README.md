@@ -1,4 +1,4 @@
-# Language models for ZeroSpeech2021 submission by Univeristy of Wrocław
+# Language models for ZeroSpeech 2021 challenge by Univeristy of Wrocław
 The repository contains scripts for training and evaluating language models on sWUGGY and sBLIMP tasks (see [ZeroSpeech2021](https://zerospeech.com/2021/news.html) website for details).
 
 ## Requirements
