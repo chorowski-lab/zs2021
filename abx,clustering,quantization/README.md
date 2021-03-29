@@ -5,7 +5,7 @@ In the `CPC_audio` folder there is a snapshot of our <https://github.com/chorows
 
 The code in this folder has been used for:
   - producing nullspace-based embeddings
-     - (this is a very approximate and undetailed description for now) the code from the `CPC_audio` folder has been used to compute the nullspace
+     - the code from the `CPC_audio` folder has been used for nullspace technique; please see `CPC_audio/README.md` for the description (in the "Nullspaces" subsection)
   - producing clustering in the nullspace
     - Code from `CPC_audio` folder has been used for clustering and quantization. `CPC_audio/cpc/criterion/clustering/clustering_script.py` script from there has been used for computing the k-means clustering based on cosine lengths - embeddings and cluster centers were normalized for computing distances, and resulting clusters were normalized too (see `cluster_cosine.sh` script in this folder). For cluster assignment, `CPC_audio/scripts/quantize_audio.py` has been used, also with normalizing lengths of embeddings for cosine-distance-based assignment (see `cosine_quant_assign_cosine...` scripts in this folder). For basline quantizations we also used `CPC_audio/scripts/quantize_audio.py` (taken from zerospeech2021_baseline repo).
   - performing pushing embeddings to closest centers 

@@ -1,10 +1,3 @@
-
-**THIS IS A SNAPSHOT OF <https://github.com/chorowski-lab/CPC_audio> repo (*nullspace\_vecnorm\_merge* branch in case not merged into master branch yet). It uses parts or full repos: <https://github.com/facebookresearch/CPC_audio>, <https://github.com/facebookresearch/CPC_audio/tree/zerospeech>, <https://github.com/tuanh208/CPC_audio/tree/zerospeech>,  <https://github.com/bootphon/zerospeech2021_baseline>**
-
-Original <https://github.com/facebookresearch/CPC_audio> readme below
-
-----------------------------
-
 # CPC_audio
 
 This code implements the Contrast Predictive Coding algorithm on audio data, as described in the paper [Unsupervised Pretraining Transfers well Across Languages](https://arxiv.org/abs/2002.02848). This is an unsupervised method to train audio features directly from the raw waveform.
@@ -128,6 +121,23 @@ python cpc/eval/linear_separability.py -$PATH_DB $TRAINING_SET $VAL_SET model1.p
 
 Will evaluate the speaker separability of the concatenation of the features from model1 and model2.
 
+`--gru_level` controls from which layer of autoregressive part of CPC to extract the features. By default it's the last one.
+
+### Nullspaces:
+
+To conduct the nullspace experiment, first classify speakers using two factorized matrices `A` (`DIM_EMBEDDING` x `DIM_INBETWEEN`) and `B` (`DIM_INBETWEEN` x `SPEAKERS`). You'll want to extract `A'`, the nullspace of matrix `A` (of size `DIM_EMBEDDING` x (`DIM_EMBEDDING` - `DIM_INBETWEEN`)), to make the embeddings less sensitive to speakers. 
+```bash 
+python cpc/eval/linear_separability.py $PATH_DB $TRAINING_SET $VAL_SET $CHECKPOINT_TO_LOAD --pathCheckpoint $PATH_CHECKPOINT --mode speakers_factorized  --model cpc --dim_inter $DIM_INBETWEEN --gru_level 2
+```
+
+Next, you evaluate the phone and speaker separabilities of the embeddings from CPC projected into the nullspace `A'`.
+```bash
+python cpc/eval/linear_separability.py $PATH_DB $TRAINING_SET $VAL_SET $CHECKPOINT_TO_LOAD --pathCheckpoint $PATH_CHECKPOINT --mode phonemes_nullspace --model cpc --pathPhone $PATH_TO_PHONE_LABELS --path_speakers_factorized $PATH_CHECKPOINT_SPEAKERS_FACTORIZED --dim_inter $DIM_INBETWEEN --gru_level 2
+```
+
+```bash
+python cpc/eval/linear_separability.py $PATH_DB $TRAINING_SET $VAL_SET $CHECKPOINT_TO_LOAD --pathCheckpoint $PATH_CHECKPOINT --mode speakers_nullspace --model cpc --path_speakers_factorized $PATH_CHECKPOINT_SPEAKERS_FACTORIZED --dim_inter $DIM_INBETWEEN --gru_level 2
+```
 
 ### ABX score:
 
