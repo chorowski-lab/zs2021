@@ -127,3 +127,15 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# lms
+zerospeech_lm/scripts/submission.py
+zerospeech_lm/scripts/evaluate_submission.sh
+zerospeech_lm/scripts/validate_submission.sh
+zerospeech_lm/scripts/compute_final_score.py
+zerospeech_lm/scripts/entropy.py
+
+zerospeech_lm/outputs/
+
+zerospeech_lm/data/pjn.py
+
