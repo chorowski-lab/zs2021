@@ -7,12 +7,15 @@ from more_itertools import pairwise, grouper
 from numba import njit, prange
 import numpy as np
 import os
+import pathlib
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Compute the pseudo log-proba of a list of sentences')
 
     parser.add_argument('config', type=str,
                         help='Location of the .yaml config file')
+
+    parser.add_argument('--overwrite', action='store_true', help='Overwrite files if already created')
 
     parser.add_argument('--debug', type=int,
                         help='run in debug mode, listening on specified port')
@@ -121,10 +124,13 @@ def _dtw_numba(s, t, d):
 def dtw(config):
     dist = None
     if 'distMatrix' in config:
-        dist = []
-        for line in open(config['distMatrix'], 'r', encoding='utf8'):
-            dist.append(list(map(float, line.strip().split()))) 
-        dist = np.array(dist)
+        if config['distMatrix'].strip().endswith('.npy'):
+            dist = np.load(config['distMatrix'].strip())
+        else:
+            dist = []
+            for line in open(config['distMatrix'], 'r', encoding='utf8'):
+                dist.append(list(map(float, line.strip().split()))) 
+            dist = np.array(dist)
 
     @njit(parallel=True)
     def f(seq, dataset, lengths, n):
@@ -141,17 +147,17 @@ def dtw(config):
 def list_to_str(l):
     d = defaultdict(int)
     for i in l:
-        d[i] += 1
+        d[int(i)] += 1
     return str(dict(d)).replace(' ', '')
     
 
-def run(config, method, testset, trainset):
+def run(args, config, method, testset, trainset):
     bar = ProgressBar(maxval=len(testset))
     bar.start()
     i = 0
     for si, subset in enumerate(grouper(testset, config['saveEvery'])):
         path = config["outPath"]+ '-' + str(si+1)
-        if os.path.exists(path):
+        if os.path.exists(path) and not args.overwrite:
             print(f'File {path} already exists, skipping')
         else:
             with open(path, 'w') as out:
@@ -162,14 +168,14 @@ def run(config, method, testset, trainset):
     bar.finish()
 
 
-def extended_run(config, ext_depth, method, testset, trainset):
+def extended_run(args, config, ext_depth, method, testset, trainset):
     bar = ProgressBar(maxval=len(testset))
     bar.start()
     i = 0
     indices = slice(ext_depth) if isinstance(ext_depth, int) else ext_depth
     for si, subset in enumerate(grouper(testset, config['saveEvery'])):
         path = config["outPath"]+ '-' + str(si+1)
-        if os.path.exists(path):
+        if os.path.exists(path) and not args.overwrite:
             print(f'File {path} already exists, skipping')
         else:
             with open(path, 'w') as out:
@@ -185,6 +191,10 @@ def extended_run(config, ext_depth, method, testset, trainset):
 
 
 def main(args, config):
+    outPath = pathlib.Path(config['outPath']) / '..'
+    if not os.path.exists(outPath):
+        print(f'Output path {config["outPath"]} does not exists, created')
+        os.makedirs(outPath)
 
     transform = None
     if 'transform' in config and config['transform']['name'] == 'squash':
@@ -202,9 +212,12 @@ def main(args, config):
     method = dtw(config['method'])
 
     if 'extended' in config['method']:
-        extended_run(config, config['method']['extended'], method, test, train)
+        with open(outPath / '!info.txt', 'w') as out:
+            for i in config['method']['extended']:
+                out.write(str(i)+'\n')
+        extended_run(args, config, config['method']['extended'], method, test, train)
     else:
-        run(config, method, test, train)
+        run(args, config, method, test, train)
 
 
 if __name__ == "__main__":

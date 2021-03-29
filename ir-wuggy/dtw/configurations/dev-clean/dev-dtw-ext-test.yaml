@@ -1,0 +1,13 @@
+trainPath: /pio/data/zerospeech2021/quantized/LibriSpeech/dev-clean
+testPath: /pio/data/zerospeech2021/quantized/lexical/dev-big-no-oov
+outPath: /pio/scratch/1/i290956/zs2021/output/lexical/dev-clean/dtw-dm-ext-test/dev
+method:
+  name: 'dtw'
+  distMatrix: /pio/scratch/1/i290956/zs2021/lexical/dm/distMatrix2.npy
+  extended:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+saveEvery: 2000

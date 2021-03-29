@@ -23,7 +23,8 @@ def parseArgs():
 def _min(desc):
     d = desc[0][1:-1]
     r = {int(x.split(':')[0]): int(x.split(':')[1]) for x in d.split(',') }
-    return - min(r.keys())
+    total = sum(k * v for k, v in sorted(r.items()))
+    return - min(r.keys()) / total
 
 def _test(desc):
     d = desc[0][1:-1]
@@ -52,10 +53,15 @@ def _sum(desc):
     return - sum(k * v for k, v in sorted(r.items()))
 
 def _x_min(args, dtoi):
-    k = dtoi[args.q] if dtoi is not None else args.q
-    def f(desc):
-        r = desc[1:-1].split(',')
-        return - float(r[0]) / float(r[k])
+    if args.q is None:
+        def f(desc):
+            r = desc[1:-1].split(',')
+            return - float(r[0])
+    else:
+        k = dtoi[args.q] if dtoi is not None else args.q
+        def f(desc):
+            r = desc[1:-1].split(',')
+            return - float(r[0]) / float(r[k])
     return f
 
 

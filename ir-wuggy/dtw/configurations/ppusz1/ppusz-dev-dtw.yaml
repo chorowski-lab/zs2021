@@ -1,4 +1,4 @@
-trainFile: /pio/scratch/1/i290956/zs2021/quantized/ppusz/LibriSpeech/dev-clean.txt
+trainFile: /pio/scratch/1/i283340/MGR/zs/quantization/resDevCleanShortened-4_resultstable1/quantized.txt
 testFile: /pio/scratch/1/i290956/zs2021/quantized/ppusz/lexical/dev.txt
 outPath: ./output/lexical/ppusz-dev-clean/dtw/dev
 method:
