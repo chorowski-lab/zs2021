@@ -1,0 +1,49 @@
+# data
+data_dir: /path/to/LibriSpeech/train/split # features or quantizations of train sequences
+eval_data_dir: /path/to/eval/dataset # eval data for WUGGY and BLIMP
+seq_alignment: true
+quantized: true # if to train model on quantized representations instead of continuous ones
+
+# clustering
+clustering: kmeans
+n_clusters: 50
+load_clustering: true # if false clustering will be trained
+clustering_dir: /path/to/trained/clustering
+
+# model
+arch: LSTM
+bidirectional: false
+hidden_dim: 1024
+num_layers: 3
+
+# arch: LSTM
+# bidirectional: true
+# hidden_dim: 2048
+# num_layers: 2
+
+# arch: QRNN
+# hidden_dim: 2048
+# num_layers: 3
+
+inverse_seqs: false
+emb_dim: 200
+
+# training
+seq_len: 1200
+bsz: 150
+lr: 0.0001
+num_epochs: 1000
+
+load_model: false
+load_dir: /path/to/load/model/checkpoint
+
+# evaluation
+dev_only: false # if to calculate scores for dev split only
+
+# logs
+save_dir: /path/to/save/model/
+tensorboard_dir: /path/to/tensorboard/logs
+
+# gpu
+device: cuda
+nGPU: 2
