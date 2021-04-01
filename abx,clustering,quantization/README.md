@@ -18,3 +18,135 @@ It is also worth mentioning that we found out the following workflow improved th
  - remove extra files
  - compute other things on top of those
 in comparison to computing features for datasets used for ZeroSpeech phonetic metric evaluation. This can perhaps be because audio data in LibriSpeech is (at least sometimes) consecutive and removing parts of it (some files, as in ZeroSpeech ABX-evaluation dataset) may harm autoregressive context (as `zerospeech2021_baseline/scripts/build_CPC_features.py` script we used for building features keeps autoregressive context between files as default, so removing some consecutive-audio files was perhaps making high-level features out-of-date (by some files))
+
+
+
+## How to reproduce:
+
+Names written in capital letters are to be changed to user-specific when executing this
+
+
+### Reproducing baseline ABX with workflow described in the submission paper:
+
+1. Install `zeroseppech2021_baseline` with the environment and download checkpoints as described in its readme
+2. Run:
+```
+reproduce_baseline_ABX.sh ZEROSPEECH2021_BASELINE_PATH LIBRISPEECH_PATH ZEROSPEECH_DATASET_PATH SAVE_DIR
+```
+
+This will leave produced embeddings under `SAVE_DIR/reproduce_baseline_ABX_submission/phonetic`.
+
+
+### Performing k-means clustering on nullspace embeddings and producing quantizations:
+
+1. Install CPC_audio with the environment (version under `CPC_audio` folder here) and soundfile with pip instead of conda one and activate it
+2. For cosine k-means clustering and cosine-closest assignment quantizations run:
+  ```
+  cluster_nullspace_cosine_and_quantize.sh LIBRISPEECH_PATH flac ZEROSPEECH_DATASET_PATH wav SAVE_DIR NULLSPACE_MODEL_NO_CLUSTERING_CHECKPOINT_PATH
+  ```
+  For euclidean k-means clustering and euclidean-closest assignment quantizations run:
+  ```
+  cluster_nullspace_cosine_and_quantize.sh LIBRISPEECH_PATH flac ZEROSPEECH_DATASET_PATH wav SAVE_DIR NULLSPACE_MODEL_NO_CLUSTERING_CHECKPOINT_PATH
+  ```
+
+
+
+### Baseline quantization
+
+1. Install CPC_audio with the environment (version under `CPC_audio` folder here) and soundfile with pip instead of conda one and activate it
+2. Run:
+  ```
+  quantize_baseline.sh LIBRISPEECH_PATH flac ZEROSPEECH_DATASET_PATH wav SAVE_DIR BASELINE_KMEANS50BIG_CHECKPOINT_PATH
+  ```
+
+
+
+### Center-pushing for ABX
+
+1. Install and activate `zerospeech2021` environment
+2. For chosen configuration (see examples below), run:
+```
+push_and_eval_embeddings.sh \
+ZEROSPEECH_PHONETIC_EMBEDDINGS_ROOT \
+MODEL_WITH_COMPUTED_CLUSTERING_CHECKPOINT \
+SUBMISSIONS_TO_EVALUATE_SAVE_PATH \
+ZEROSPEECH_DATASET_PATH \
+LIST_OF_PUSH_DEGREES \
+CLOSEST_CLUSTER_CHOICE_METHOD \
+NORMALIZE_FOR_PUSH_CHOICE
+```
+For example to reproduce center-pushing for reproducing the results from the table in submission paper (SAVE_DIR is one used for performing k-means clustering on nullspace embeddings as above):
+```
+# nullspace/cosine/cosine
+push_and_eval_embeddings.sh \
+ZEROSPEECH_NULLSPACE_PHONETIC_EMBEDDINGS_ROOT \
+SAVE_DIR/trained_nullspace_cosine_kmeans/kmeans50checkpoint.pt \
+SUBMISSIONS_TO_EVALUATE_SAVE_PATH \
+ZEROSPEECH_DATASET_PATH \
+"0.2 0.3 0.4 0.5 0.6 0.7" \
+cosineclosest \
+dontnormalizeforpush
+
+# nullspace/euclidean/cosine
+push_and_eval_embeddings.sh \
+ZEROSPEECH_NULLSPACE_PHONETIC_EMBEDDINGS_ROOT \
+SAVE_DIR/trained_nullspace_euclidean_kmeans/kmeans50checkpoint.pt \
+SUBMISSIONS_TO_EVALUATE_SAVE_PATH \
+ZEROSPEECH_DATASET_PATH \
+"0.2 0.3 0.4 0.5 0.6 0.7" \
+cosineclosest \
+dontnormalizeforpush
+
+# no nullspace/euclidean/cosine
+push_and_eval_embeddings.sh \
+ZEROSPEECH_BASELINE_PHONETIC_EMBEDDINGS_ROOT \
+BASELINE_KMEANS50BIG_CHECKPOINT_PATH \
+SUBMISSIONS_TO_EVALUATE_SAVE_PATH \
+ZEROSPEECH_DATASET_PATH \
+"0.2 0.3 0.4 0.5 0.6 0.7" \
+cosineclosest \
+dontnormalizeforpush
+```
+To compute for other configurations we tried mentioned and not presented in the paper:
+```
+# nullspace/cosine/euclidean
+push_and_eval_embeddings.sh \
+ZEROSPEECH_NULLSPACE_PHONETIC_EMBEDDINGS_ROOT \
+SAVE_DIR/trained_nullspace_cosine_kmeans/kmeans50checkpoint.pt \
+SUBMISSIONS_TO_EVALUATE_SAVE_PATH \
+ZEROSPEECH_DATASET_PATH \
+"0.2 0.3 0.4 0.5 0.6 0.7" \
+euclideanclosest \
+dontnormalizeforpush
+
+# nullspace/euclidean/euclidean
+push_and_eval_embeddings.sh \
+ZEROSPEECH_NULLSPACE_PHONETIC_EMBEDDINGS_ROOT \
+SAVE_DIR/trained_nullspace_euclidean_kmeans/kmeans50checkpoint.pt \
+SUBMISSIONS_TO_EVALUATE_SAVE_PATH \
+ZEROSPEECH_DATASET_PATH \
+"0.2 0.3 0.4 0.5 0.6 0.7" \
+euclideanclosest \
+dontnormalizeforpush
+
+# nullspace/cosine/cosine + normpush (normalize before push 
+# - approximate pushing part of cosine and not euclidean distance)
+push_and_eval_embeddings.sh \
+ZEROSPEECH_NULLSPACE_PHONETIC_EMBEDDINGS_ROOT \
+SAVE_DIR/trained_nullspace_cosine_kmeans/kmeans50checkpoint.pt \
+SUBMISSIONS_TO_EVALUATE_SAVE_PATH \
+ZEROSPEECH_DATASET_PATH \
+"0.1 0.2 0.3 0.4 0.5 0.6" \
+cosineclosest \
+normalizeforpush
+
+# no nullspace/euclidean/euclidean
+push_and_eval_embeddings.sh \
+ZEROSPEECH_BASELINE_PHONETIC_EMBEDDINGS_ROOT \
+BASELINE_KMEANS50BIG_CHECKPOINT_PATH \
+SUBMISSIONS_TO_EVALUATE_SAVE_PATH \
+ZEROSPEECH_DATASET_PATH \
+"0.2 0.3 0.4 0.5 0.6 0.7" \
+euclideanclosest \
+dontnormalizeforpush
+```
