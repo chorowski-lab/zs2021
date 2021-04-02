@@ -14,11 +14,13 @@ def parseArgs():
     parser.add_argument('--k', type=int,
                         help='Parameter for the "first_k" method.')
     parser.add_argument('--n', type=int, 
-                        help='Number of the dev-i files. Default: 20')
-    parser.add_argument('--q', type=int, 
-                        help='Parameter for the "min_x" method.')
+                        help='Number of the dev-i files.')
+    parser.add_argument('--norm', type=int, 
+                        help='Parameter for the "min" method in extended variant - normaliation.')
+    parser.add_argument('--test', action='store_true', help='If set, then the output file will be named "test.txt" instead of "dev.txt".')
 
     return parser.parse_args()
+
 
 def _min(desc):
     d = desc[0][1:-1]
@@ -26,10 +28,6 @@ def _min(desc):
     total = sum(k * v for k, v in sorted(r.items()))
     return - min(r.keys()) / total
 
-def _test(desc):
-    d = desc[0][1:-1]
-    r = {int(x.split(':')[0]): int(x.split(':')[1]) for x in d.split(',') }
-    return - min(r.keys()) - sum(k * v for k, v in sorted(r.items())) / 100000000000000000
 
 def _firstk(k):
     def f(desc):
@@ -47,18 +45,20 @@ def _firstk(k):
         return s
     return f
 
+
 def _sum(desc):
     d = desc[0][1:-1]
     r = {int(x.split(':')[0]): int(x.split(':')[1]) for x in d.split(',') }
     return - sum(k * v for k, v in sorted(r.items()))
 
+
 def _x_min(args, dtoi):
-    if args.q is None:
+    if args.norm is None:
         def f(desc):
             r = desc[1:-1].split(',')
             return - float(r[0])
     else:
-        k = dtoi[args.q] if dtoi is not None else args.q
+        k = dtoi[args.norm] if dtoi is not None else args.norm
         def f(desc):
             r = desc[1:-1].split(',')
             return - float(r[0]) / float(r[k])
@@ -114,7 +114,7 @@ def main(args):
 
             print(f'Using method: {args.method}')
 
-            with open('./output/lexical/dev.txt', 'w', encoding='utf8') as out:
+            with open(f'./output/lexical/{"test" if args.test else "dev"}.txt', 'w', encoding='utf8') as out:
                 for i in range(1, n+1):
                     for line in open(f'{args.data}/dev-{i}', 'r'):
                         fname = line.strip().split()[0]
@@ -122,7 +122,7 @@ def main(args):
                         out.write(f'{fname} {method(desc)}\n')
 
         elif variant == 'lookup':
-            with open('./output/lexical/dev.txt', 'w', encoding='utf8') as out:
+            with open(f'./output/lexical/{"test" if args.test else "dev"}.txt', 'w', encoding='utf8') as out:
                 for i in range(1, n+1):
                     for line in open(f'{args.data}/dev-{i}'):
                         fname = line.split()[0]
@@ -158,7 +158,7 @@ def main(args):
 
             print(f'Using method: {args.method}')
 
-            with open('./output/lexical/dev.txt', 'w', encoding='utf8') as out: 
+            with open(f'./output/lexical/{"test" if args.test else "dev"}.txt', 'w', encoding='utf8') as out: 
                 for i in range(1, n+1):
                     for line in open(f'{args.data}/dev-{i}', 'r'):
                         fname = line.strip().split()[0]
