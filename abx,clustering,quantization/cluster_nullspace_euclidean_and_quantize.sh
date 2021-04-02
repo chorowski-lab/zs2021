@@ -18,7 +18,7 @@ nullspaceTypeOfCheckpoint=nullspace
 # base checkpoint without clustering data, needs to be consistent with nullspaceTypeOfCheckpoint
 baseModelCheckpoint=$6  
 
-cluster_embeddings.sh \
+./cluster_embeddings.sh \
 ${LibriSpeechPath}/train-clean-100/ \
 $baseModelCheckpoint \
 ${saveThingsPath}/trained_nullspace_euclidean_kmeans/kmeans50checkpoint.pt \
@@ -52,7 +52,7 @@ do
 
     mkdir -p $2
 
-    quantize.sh \
+    ./quantize.sh \
     ${saveThingsPath}/trained_nullspace_euclidean_kmeans/kmeans50checkpoint.pt \
     $1 \
     $2 \

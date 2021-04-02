@@ -25,11 +25,9 @@ featureFilesBad = [fn for fn in os.listdir(featureRoot) if os.path.isfile(os.pat
 
 print(f'Ok feature files: {len(featureFilesOk)}, extra feature files to be removed: {len(featureFilesBad)}')
 
-#os.makedirs(newFeatureRoot)
 
 i = 0
-for fn in featureFilesBad:  #featureFilesOk:
-    #copyfile(os.path.join(featureRoot, fn), os.path.join(newFeatureRoot, fn))
+for fn in featureFilesBad:  
     os.remove(os.path.join(featureRoot, fn))
     i += 1
     if i % 100 == 0:

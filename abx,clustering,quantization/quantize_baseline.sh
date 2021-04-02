@@ -22,16 +22,16 @@ PREVIFS=$IFS
 # we didn't use option to discard context between files when processing evaluation set with e.g. word per file
 # hoping that maybe it will still be better than cold start
 setsToProcess=\
-"${LibriSpeechPath}/LibriSpeech/train-clean-100,${saveThingsPath}/baseline_quantizations/LibriSpeech/train-clean-100,32,${LibriSpeechFormat} \
-${LibriSpeechPath}/LibriSpeech/train-full-960,${saveThingsPath}/baseline_quantizations/LibriSpeech/train-full-960,32,${LibriSpeechFormat} \
-${evalDSpath}/lexical/dev,${saveThingsPath}/baseline_quantizations/evalDS/lexical/dev,128,${evalDSformat} \
-${evalDSpath}/lexical/test,${saveThingsPath}/baseline_quantizations/evalDS/lexical/test,128,${evalDSformat} \
-${evalDSpath}/semantic/dev/librispeech,${saveThingsPath}/baseline_quantizations/evalDS/semantic/dev/librispeech,128,${evalDSformat} \
-${evalDSpath}/semantic/dev/synthetic,${saveThingsPath}/baseline_quantizations/evalDS/semantic/dev/synthetic,128,${evalDSformat} \
-${evalDSpath}/semantic/test/librispeech,${saveThingsPath}/baseline_quantizations/evalDS/semantic/test/librispeech,128,${evalDSformat} \
-${evalDSpath}/semantic/test/synthetic,${saveThingsPath}/baseline_quantizations/evalDS/semantic/test/synthetic,128,${evalDSformat} \
-${evalDSpath}/syntactic/dev,${saveThingsPath}/baseline_quantizations/evalDS/syntactic/dev,128,${evalDSformat} \
-${evalDSpath}/syntactic/test,${saveThingsPath}/baseline_quantizations/evalDS/syntactic/test,128,${evalDSformat}"
+"${LibriSpeechPath}/LibriSpeech/train-clean-100,${saveThingsPath}/baseline_quantizations/LibriSpeech/train-clean-100,8,${LibriSpeechFormat} \
+${LibriSpeechPath}/LibriSpeech/train-full-960,${saveThingsPath}/baseline_quantizations/LibriSpeech/train-full-960,8,${LibriSpeechFormat} \
+${evalDSpath}/lexical/dev,${saveThingsPath}/baseline_quantizations/evalDS/lexical/dev,8,${evalDSformat} \
+${evalDSpath}/lexical/test,${saveThingsPath}/baseline_quantizations/evalDS/lexical/test,8,${evalDSformat} \
+${evalDSpath}/semantic/dev/librispeech,${saveThingsPath}/baseline_quantizations/evalDS/semantic/dev/librispeech,8,${evalDSformat} \
+${evalDSpath}/semantic/dev/synthetic,${saveThingsPath}/baseline_quantizations/evalDS/semantic/dev/synthetic,8,${evalDSformat} \
+${evalDSpath}/semantic/test/librispeech,${saveThingsPath}/baseline_quantizations/evalDS/semantic/test/librispeech,8,${evalDSformat} \
+${evalDSpath}/semantic/test/synthetic,${saveThingsPath}/baseline_quantizations/evalDS/semantic/test/synthetic,8,${evalDSformat} \
+${evalDSpath}/syntactic/dev,${saveThingsPath}/baseline_quantizations/evalDS/syntactic/dev,8,${evalDSformat} \
+${evalDSpath}/syntactic/test,${saveThingsPath}/baseline_quantizations/evalDS/syntactic/test,8,${evalDSformat}"
 
 IFS=' '
 for i in $setsToProcess
@@ -42,7 +42,7 @@ do
 
     mkdir -p $2
 
-    quantize.sh \
+    ./quantize.sh \
     $baseModelCheckpoint \
     $1 \
     $2 \

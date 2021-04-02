@@ -12,6 +12,6 @@ for item in $3 ; do  # passing list args:   "arg1_subarg1 arg1_subarg2"
     echo $outputDir
     mkdir $outputDir
     echo $outputDir >> $outFile
-    zerospeech2021-evaluate --force-cpu --no-lexical --no-syntactic --no-semantic -j 20 -o $outputDir $datasetDir $submDir >> $outFile   # --force-cpu
+    zerospeech2021-evaluate --force-cpu --no-lexical --no-syntactic --no-semantic -j 20 -o $outputDir $datasetDir $submDir >> $outFile
 done
 

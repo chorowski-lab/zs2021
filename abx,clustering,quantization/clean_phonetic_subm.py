@@ -39,40 +39,17 @@ print(len(submFilesDevOtherOk), len(submFilesDevOtherBad))
 
 print(f'Bad files: {len(submFilesDevCleanBad) + len(submFilesDevOtherBad)}, ok files: {len(submFilesDevCleanOk)}, {len(submFilesDevOtherOk)}')
 
-# os.makedirs(newSubmRoot + "/phonetic")
-# os.makedirs(newSubmRoot + "/phonetic/dev-clean")
-# os.makedirs(newSubmRoot + "/phonetic/dev-other")
-# #if not os.path.exists(shorteningRoot + "/lexical"):
-# os.makedirs(newSubmRoot + "/lexical")
-# #if not os.path.exists(shorteningRoot + "/syntactic"):
-# os.makedirs(newSubmRoot + "/syntactic")
-# #if not os.path.exists(shorteningRoot + "/semantic"):
-# os.makedirs(newSubmRoot + "/semantic")
-# #print(metadataFileToCpy)
-# copyfile(metadataFileToCpy, newSubmRoot + "/meta.yaml")
-
 i = 0
-for fn in submFilesDevCleanBad:  #submFilesDevCleanOk:
-    #copyfile(os.path.join(submRoot, "phonetic/dev-clean", fn), os.path.join(newSubmRoot, "phonetic/dev-clean", fn))
+for fn in submFilesDevCleanBad:  
     os.remove(os.path.join(submRoot, "phonetic/dev-clean", fn))
     i += 1
     if i % 100 == 0:
         print(f'{i} dev-clean files copied')
 
 i = 0
-for fn in submFilesDevOtherBad:  #submFilesDevOtherOk:
-    #copyfile(os.path.join(submRoot, "phonetic/dev-other", fn), os.path.join(newSubmRoot, "phonetic/dev-other", fn))
+for fn in submFilesDevOtherBad:  
     os.remove(os.path.join(submRoot, "phonetic/dev-other", fn))
     i += 1
     if i % 100 == 0:
         print(f'{i} dev-other files copied')
 
-# badFiles = 0
-# for fn in dirFiles:
-#     if not fn.endswith(".wav"):
-#         continue
-#     fbase = fn.split('.')[0]
-#     if fbase not in s:
-#         badFiles += 1
-
-# print(f"files outside of their DS used for ABX: {badFiles}")
