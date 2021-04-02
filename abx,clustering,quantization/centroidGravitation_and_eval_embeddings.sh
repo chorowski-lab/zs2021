@@ -29,7 +29,7 @@ parameters:
     frame_shift: 0.01
 EOF
 
-centerpush_and_eval.sh \
+./centroidGravitation_and_eval.sh \
 $clustersCheckpoint \
 "${saveSubmissionsRoot}_${closestClusterChoice}_${normalizeForPushChoice}" \
 "dev-clean{}${embeddingsRoot}/dev-clean:dev-other{}${embeddingsRoot}/dev-other:test-clean{}${embeddingsRoot}/test-clean:test-other{}${embeddingsRoot}/test-other" \

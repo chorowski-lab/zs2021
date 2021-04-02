@@ -9,7 +9,7 @@ from dsgetter import *
 import multiprocessing
 
 
-def seDistancesToCentroidsCpy(vecs, centroids, doNorm=False):
+def seDistancesToCentroids(vecs, centroids, doNorm=False):
     
     if len(vecs.shape) == 2:
         vecs = vecs.view(1, *(vecs.shape))
@@ -42,7 +42,7 @@ def pushToClosestForLine(points, centers, deg=0.5, doNorm=False, doNormForPush=F
         centrLengths = torch.sqrt((centers*centers).sum(-1))
         centers = centers / centrLengths.view(k, 1)
         
-    distsSq = seDistancesToCentroidsCpy(points, centers, doNorm=doNorm)
+    distsSq = seDistancesToCentroids(points, centers, doNorm=doNorm)
     dists = torch.sqrt(distsSq)
     dists = dists.view(*dists.shape[1:])
     
@@ -55,12 +55,9 @@ def pushToClosestForLine(points, centers, deg=0.5, doNorm=False, doNormForPush=F
 
 def computeAndSaveForLine(ar):
 
-    doCpy, lineHere, centersHere, degHere, nameHere, outHereH, doNorm, doNormForPush = ar
+    lineHere, centersHere, degHere, nameHere, outHereH, doNorm, doNormForPush = ar
 
-    if doCpy != 'yes':
-        encoded2 = pushToClosestForLine(lineHere, centersHere, deg=degHere, doNorm=doNorm, doNormForPush=doNormForPush)
-    else:
-        encoded2 = lineHere
+    encoded2 = pushToClosestForLine(lineHere, centersHere, deg=degHere, doNorm=doNorm, doNormForPush=doNormForPush)
     
     np.savetxt(os.path.join(outHereH, nameHere.split('.')[0] + ".txt"), np.array(encoded2))
 
@@ -77,7 +74,7 @@ def pushToClosestForBatch(points, centers, deg=0.5, doNorm=False, doNormForPush=
         centrLengths = torch.sqrt((centers*centers).sum(-1))
         centers = centers / centrLengths.view(k, 1)
 
-    distsSq = seDistancesToCentroidsCpy(points, centers, doNorm=doNorm)
+    distsSq = seDistancesToCentroids(points, centers, doNorm=doNorm)
     dists = torch.sqrt(distsSq)
      
     closest = dists.argmin(-1)
@@ -87,14 +84,11 @@ def pushToClosestForBatch(points, centers, deg=0.5, doNorm=False, doNormForPush=
     return res
 
 
-def computeAndSaveForBatch(doCpy, batch, centersHere, degHere, namesHere, lengthsHere, outHereH, doNorm, doNormForPush):
+def computeAndSaveForBatch(batch, centersHere, degHere, namesHere, lengthsHere, outHereH, doNorm, doNormForPush):
 
     B = batch.shape[0]
     
-    if doCpy != 'yes':
-        encoded2 = pushToClosestForBatch(batch, centersHere, deg=degHere, doNorm=doNorm, doNormForPush=doNormForPush)
-    else:
-        encoded2 = batch
+    encoded2 = pushToClosestForBatch(batch, centersHere, deg=degHere, doNorm=doNorm, doNormForPush=doNormForPush)
     
     for i in range(B):
         np.savetxt(os.path.join(outHereH, namesHere[i].split('.')[0] + ".txt"), np.array(encoded2[i][:lengthsHere[i]].cpu()))
@@ -126,8 +120,8 @@ if __name__ == '__main__':
     
     poolSettings = sys.argv[6]
     
-    justCpy = sys.argv[7]
-    degs = list(map(float, sys.argv[8].split(':')))
+    #justCpy = sys.argv[7]
+    degs = list(map(lambda x: (float(x), x), sys.argv[8].split(':')))
     print(degs)
     
     # makes dists cosine
@@ -155,11 +149,14 @@ if __name__ == '__main__':
     if poolSettings != "cuda":
         pool = multiprocessing.Pool(int(poolSettings))
     else:
-        centers = centers.cuda()
+        centers = centers.cuda()  
+        # GPU option is highly unoptimized collating lengths of all lines in batch to longest file
+        # and doing much unnecessary computation therefore
+        # we actually used CPU option
 
-    for deg in degs:
+    for deg, degString in degs:
 
-        rootOutPathPrefix = rootOutPathNoMPrefix + "_deg" + str(deg).replace('.','-')
+        rootOutPathPrefix = rootOutPathNoMPrefix + "_deg" + degString  # str(deg).replace('.','-')
         print("---->", rootOutPathPrefix)
 
         if not os.path.exists(rootOutPathPrefix):
@@ -198,12 +195,12 @@ if __name__ == '__main__':
 
                 if poolSettings != "cuda":
 
-                    mapArgs = [(justCpy, batch[i][:lengths[i]], centers, deg, names[i], outHere, doNorm, doNormForPush) for i in range(batch.shape[0])]
+                    mapArgs = [(batch[i][:lengths[i]], centers, deg, names[i], outHere, doNorm, doNormForPush) for i in range(batch.shape[0])]
 
                     pool.map(computeAndSaveForLine, mapArgs)
 
                 else:
                     batch = batch.cuda()
-                    computeAndSaveForBatch(justCpy, batch, centers, deg, names, lengths, outHere, doNorm, doNormForPush)
+                    computeAndSaveForBatch(batch, centers, deg, names, lengths, outHere, doNorm, doNormForPush)
 
 

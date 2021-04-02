@@ -44,7 +44,7 @@ else
 fi
 
 for deg in $degList ; do
-    python closestpush.py \
+    python centroidGravitation.py \
     $clustersCheckpoint \
     $saveSubmissionRoot \
     $inOutSubsetsDescr \
