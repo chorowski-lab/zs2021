@@ -150,3 +150,70 @@ ZEROSPEECH_DATASET_PATH \
 euclideanclosest \
 dontnormalizeforpush
 ```
+
+### Nullspace experiments
+
+1. Install CPC_audio with the environment (version under CPC_audio folder here) and soundfile with pip instead of conda one and activate it
+2. Run `finetune_nullspace.sh` from `CPC_audio` directory:
+
+```
+Usage: ./finetune_nullspace.sh
+        -d DATASET_PATH
+        -t TRAIN_SET
+        -v VALIDATION_SET
+        -c CHECKPOINT_PATH
+        -o OUTPUT_DIR
+        -n DIM_INBETWEEN (Dimension of nullspace will be DIM_EMBEDDING - DIM_INBETWEEN)
+OPTIONAL ARGS:
+        -f FROM_STEP (From which step do you want to start. Order: speakers_factorized [default] -> phonemes_nullspace -> speakers_nullspace)
+        -p PHONES_PATH (Path to the file containing phonemes for the entire dataset. You don't need it if you start from speakers_nullspace)
+```
+In order to reproduce our experiment from the paper, run the following:
+
+```bash
+for i in 256 320 416 448 464
+do
+    ./finetune_nullspace.sh -d DATASET_PATH -t TRAIN_SET -v VALIDATION_SET -c CHECKPOINT_PATH -o OUTPUT_DIR/$i -n $(expr 512 - $i) -p PHONES_PATH
+done
+```
+
+### Evaluating ABX
+
+1. Install `zerospeech2021` environment
+2. Install CPC_audio with the environment (version under CPC_audio folder here) and soundfile with pip instead of conda one and activate it
+3. Create the LibriSpeech dev/test dataset. Once you have done this you do not have to do it anymore:
+```bash
+for directory in dev-clean dev-other test-clean test-other
+do
+  mkdir -p $LIBRISPEECH_DATASET_PATH/phonetic/$directory
+  cp $LIBRISPEECH_PATH/$directory/*/*/*.wav $LIBRISPEECH_DATASET_PATH/phonetic/$directory
+done
+
+for directory in dev-clean dev-other
+do
+  cp $ORIGINAL_DATASET_PATH/phonetic/$directory/$directory.item $LIBRISPEECH_DATASET_PATH/phonetic/$directory
+done
+```
+4. Run `scripts/eval_abx.sh` from `CPC_audio` directory:
+
+```
+Usage: scripts/eval_abx.sh
+        -d DATASET_PATH
+        -r ORIGINAL_DATASET_PATH
+        -c CHECKPOINT_PATH
+        -o OUTPUT_DIR
+OPTIONAL ARGS:
+        -n (Load a model with nullspace)
+        -a CONDA_PATH
+        -e CPC_ENVIRONMENT
+        -z ZEROSPEECH_EVAL_ENVIRONMENT (The conda environment where the zerospeech2021-evaluate is installed)
+        -t (Do not compute embeddings for test set)
+```
+In order to reproduce ABX error rates for a CPC + nullspace, run the following (Note that LIBRISPEECH_DATASET_PATH refers to the dateset created earlier and not to the path where LibriSpeech is located):
+
+```bash
+scripts/eval_abx.sh -d ORIGINAL_DATASET_PATH -r ORIGINAL_DATASET_PATH -c CHECKPOINT_PATH -o OUTPUT_DIR/original -n -a CONDA_PATH -e CPC_ENVIRONMENT -z ZEROSPEECH_EVAL_ENVIRONMENT
+
+scripts/eval_abx.sh -d LIBRISPEECH_DATASET_PATH -r ORIGINAL_DATASET_PATH -c CHECKPOINT_PATH -o OUTPUT_DIR/librispeech -n -a CONDA_PATH -e CPC_ENVIRONMENT -z ZEROSPEECH_EVAL_ENVIRONMENT
+
+```
