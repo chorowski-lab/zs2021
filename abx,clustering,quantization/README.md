@@ -36,6 +36,74 @@ $SAVE_DIR
 This will leave produced embeddings under `SAVE_DIR/reproduce_baseline_ABX_submission/phonetic`.
 
 
+### Nullspace experiments
+
+1. Install CPC_audio with the environment (version under CPC_audio folder here) and soundfile with pip instead of conda one and activate it
+2. Run `finetune_nullspace.sh` from `CPC_audio` directory:
+
+```
+Usage: ./finetune_nullspace.sh
+        -d LIBRISPEECH_DATASET_PATH/train-clean-100 
+        -t LIBRISPEECH_TRAIN_CLEAN_100_TRAIN_SPLIT_FILE_PATH
+        -v LIBRISPEECH_TRAIN_CLEAN_100_TEST_SPLIT_FILE_PATH
+        -c BASELINE_NO_CLUSTERING_CHECKPOINT_PATH
+        -o SAVE_DIR
+        -n DIM_INBETWEEN (Dimension of nullspace will be DIM_EMBEDDING - DIM_INBETWEEN)
+OPTIONAL ARGS:
+        -f FROM_STEP (From which step do you want to start. Order: speakers_factorized [default] -> phonemes_nullspace -> speakers_nullspace)
+        -p PHONEME_ALIGNMENTS_FILE (Path to the file containing phonemes for the entire dataset. You don't need it if you start from speakers_nullspace)
+```
+In order to reproduce our experiment from the paper, run the following:
+
+```bash
+for i in 256 320 416 448 464
+do
+    ./finetune_nullspace.sh -d $LIBRISPEECH_DATASET_PATH/train-clean-100 -t $LIBRISPEECH_TRAIN_CLEAN_100_TRAIN_SPLIT_FILE_PATH -v $LIBRISPEECH_TRAIN_CLEAN_100_TEST_SPLIT_FILE_PATH -c $BASELINE_NO_CLUSTERING_CHECKPOINT_PATH -o $SAVE_DIR/$i -n $(expr 512 - $i) -p $PHONEME_ALIGNMENTS_FILE
+done
+```
+
+### Evaluating ABX for nullspace
+
+1. Install `zerospeech2021` environment
+2. Install CPC_audio with the environment (version under CPC_audio folder here) and soundfile with pip instead of conda one and activate it
+3. Create the LibriSpeech dev/test dataset. Once you have done this you do not have to do it anymore:
+```bash
+for directory in dev-clean dev-other test-clean test-other
+do
+  mkdir -p $LIBRISPEECH_FLATTENED_DATASET_PATH/phonetic/$directory
+  cp $LIBRISPEECH_DATASET_PATH/$directory/*/*/*.wav $LIBRISPEECH_FLATTENED_DATASET_PATH/phonetic/$directory
+done
+
+for directory in dev-clean dev-other
+do
+  cp $ZEROSPEECH_DATASET_PATH/phonetic/$directory/$directory.item $LIBRISPEECH_FLATTENED_DATASET_PATH/phonetic/$directory
+done
+```
+4. Run `scripts/eval_abx.sh` from `CPC_audio` directory:
+
+```
+Usage: scripts/eval_abx.sh
+        -d DATASET_PATH (Either ZEROSPEECH_DATASET_PATH or LIBRISPEECH_FLATTENED_DATASET_PATH)
+        -r ZEROSPEECH_DATASET_PATH
+        -c CHECKPOINT_PATH
+        -o SAVE_DIR
+OPTIONAL ARGS:
+        -n (Provide this flag if you want to load a model with nullspace)
+        -a CONDA_PATH
+        -e CPC_ENVIRONMENT
+        -z ZEROSPEECH_EVAL_ENVIRONMENT (The conda environment where the zerospeech2021-evaluate is installed)
+        -t (Do not compute embeddings for test set)
+```
+In order to reproduce ABX error rates for a CPC + nullspace, run the following (Note that LIBRISPEECH_FLATTENED_DATASET_PATH refers to the dateset created earlier and not to the path where LibriSpeech is located):
+
+```bash
+scripts/eval_abx.sh -d $ZEROSPEECH_DATASET_PATH -r $ZEROSPEECH_DATASET_PATH -c $CHECKPOINT_PATH -o $SAVE_DIR/original -n -a $CONDA_PATH -e $CPC_ENVIRONMENT -z $ZEROSPEECH_EVAL_ENVIRONMENT
+
+scripts/eval_abx.sh -d $LIBRISPEECH_FLATTENED_DATASET_PATH -r $ZEROSPEECH_DATASET_PATH -c $CHECKPOINT_PATH -o $SAVE_DIR/librispeech -n -a $CONDA_PATH -e $CPC_ENVIRONMENT -z $ZEROSPEECH_EVAL_ENVIRONMENT
+
+```
+
+
 ### Performing k-means clustering on nullspace embeddings and producing quantizations:
 
 1. Install CPC_audio with the environment (version under `CPC_audio` folder here) and soundfile with pip instead of conda one and activate it
@@ -156,6 +224,7 @@ dontnormalizeforpush
 ```
 
 
+
 ### Centroid-gravitation phoneme classification accuracy
 
 In order to reproduce centroid-gravitation phoneme classification accuracy results from paper:
@@ -189,4 +258,5 @@ $SAVE_DIR/trained_nullspace_euclidean_kmeans/kmeans50checkpoint.pt
 $SAVE_DIR/nullspaces/448/speakers_factorized_448/checkpoint9.pt \
 $PHONEME_ALIGNMENTS_FILE \
 $SAVE_DIR
+
 ```
