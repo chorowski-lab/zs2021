@@ -55,13 +55,17 @@ def pushToClosestForLine(points, centers, deg=0.5, doNorm=False, doNormForPush=F
 
 def computeAndSaveForLine(ar):
 
-    lineHere, centersHere, degHere, nameHere, outHereH, doNorm, doNormForPush = ar
+    line, centers, deg, name, out, doNorm, doNormForPush, isDebug = ar
 
-    encoded2 = pushToClosestForLine(lineHere, centersHere, deg=degHere, doNorm=doNorm, doNormForPush=doNormForPush)
+    encoded2 = pushToClosestForLine(line, centers, deg=deg, doNorm=doNorm, doNormForPush=doNormForPush)
     
-    np.savetxt(os.path.join(outHereH, nameHere.split('.')[0] + ".txt"), np.array(encoded2))
+    if not isDebug:
+        np.savetxt(os.path.join(out, name.split('.')[0] + ".txt"), np.array(encoded2))
+    else:
+        return encoded2
 
 
+# actually now unused even for cuda variant which now glues batch into 1 line
 def pushToClosestForBatch(points, centers, deg=0.5, doNorm=False, doNormForPush=False):
 
     B = points.shape[0]   
@@ -84,29 +88,53 @@ def pushToClosestForBatch(points, centers, deg=0.5, doNorm=False, doNormForPush=
     return res
 
 
-def computeAndSaveForBatch(batch, centersHere, degHere, namesHere, lengthsHere, outHereH, doNorm, doNormForPush):
+def computeAndSaveForBatch(batch, centers, deg, names, lengths, out, doNorm=False, doNormForPush=False, isDebug=False):
 
     B = batch.shape[0]
+
+    # actually not needed to make a shape with B, averagedLen, Dim
+    # can just cat and then restore for result
+    #sumlen = sum(lengths)
+    #linelen = int(float(sumlen + B - .99) // B)
+
+    batch1line = torch.cat([batch[i] for i in range(B)], dim=0)
+
+    encoded2 = pushToClosestForLine(batch1line, centers, deg=deg, doNorm=doNorm, doNormForPush=doNormForPush)
     
-    encoded2 = pushToClosestForBatch(batch, centersHere, deg=degHere, doNorm=doNorm, doNormForPush=doNormForPush)
-    
+    if isDebug:
+        result = torch.full(batch.shape, -1, dtype=float).cuda()
+        
+    currentBegin = 0
     for i in range(B):
-        np.savetxt(os.path.join(outHereH, namesHere[i].split('.')[0] + ".txt"), np.array(encoded2[i][:lengthsHere[i]].cpu()))
+        currentEnd = min(currentBegin + lengths[i], encoded2.shape[0])
+        if not isDebug:
+            np.savetxt(os.path.join(out, names[i].split('.')[0] + ".txt"), np.array(encoded2[currentBegin:currentEnd].cpu()))
+        else:
+            result[i][:(currentEnd-currentBegin)] = encoded2[currentBegin:currentEnd]
+        currentBegin = currentEnd
+
+    if isDebug:
+        return result
 
 
 if __name__ == '__main__':
 
-    # line0 = torch.tensor([[1,1],[1,1],[2,2.1],[2,2.1],[2,2.1],[2,2.1],[3,3.3],[3,3.3],[3,3.3]], dtype=float)
-    # line1 = torch.tensor([[1,1],[0.2,0.2],[2,2.1],[2,2.1],[2,2.1],[2,2.1],[3,3.3],[3,3.3],[3,3.3]], dtype=float)
-    # lines = torch.zeros((2, *(line0.shape)), dtype=float)
-    # lines[0] = line0
-    # lines[1] = line1
-    
-    # centers0 = torch.tensor([[1.601,1.601],[2.601,2.701],[3.601,3.901]], dtype=float)
+    if sys.argv[1] == 'debug':
 
-    # print(pushToClosestForLine(line0, centers0, deg=0.5, doNorm=True))  
-    # print("lines: ", lines.shape)
-    # print(pushToClosestForBatch(lines, centers0, deg=0.5, doNorm=True))  
+        line0 = torch.tensor([[1,1],[1,1],[2,2.1],[2,2.1],[2,2.1],[2,2.1],[3,3.3],[3,3.3],[3,3.3]], dtype=float)
+        line1 = torch.tensor([[1,1],[0.2,0.2],[2,2.1],[2,2.1],[2,2.1],[2,2.1],[3,3.3],[3,3.3],[-1,-1]], dtype=float)
+        lines = torch.zeros((2, *(line0.shape)), dtype=float)
+        lines[0] = line0
+        lines[1] = line1
+        
+        centers0 = torch.tensor([[1.601,1.601],[2.601,2.701],[3.601,3.901]], dtype=float)
+
+        print(computeAndSaveForLine((line0, centers0, 0.5, None, None, True, False, True)))  
+        print("lines: ", lines.shape)
+        print(computeAndSaveForBatch(lines, centers0, 0.5, None, [9,8], None, doNorm=True, isDebug=True)) 
+        sys.stdout.flush()
+
+        exit() 
 
     clustersFile = sys.argv[1]
     rootOutPathNoMPrefix = sys.argv[2]
@@ -195,7 +223,7 @@ if __name__ == '__main__':
 
                 if poolSettings != "cuda":
 
-                    mapArgs = [(batch[i][:lengths[i]], centers, deg, names[i], outHere, doNorm, doNormForPush) for i in range(batch.shape[0])]
+                    mapArgs = [(batch[i][:lengths[i]], centers, deg, names[i], outHere, doNorm, doNormForPush, False) for i in range(batch.shape[0])]
 
                     pool.map(computeAndSaveForLine, mapArgs)
 
