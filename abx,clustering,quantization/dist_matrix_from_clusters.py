@@ -5,15 +5,14 @@ import numpy as np
 import torch
 
 def seDistancesOfCenters(centers):
-    #print(np.square(centers).sum(1)[:,np.newaxis].shape, np.square(centers).sum(1)[:,np.newaxis])
-    #print(np.square(centers).sum(1)[np.newaxis,:].shape, np.square(centers).sum(1)[np.newaxis,:])
-    #print(np.matmul(centers, centers.T).shape, np.matmul(centers, centers.T))
     return np.square(centers).sum(1)[:,np.newaxis] + np.square(centers).sum(1)[np.newaxis,:] - 2*np.matmul(centers, centers.T)  
 
 
-clustersFile = sys.argv[1]
-outDir = sys.argv[2]
-doSq = sys.argv[3]
+clustersFile = sys.argv[1]  # path to checkpoint containing cluster centers
+outDir = sys.argv[2]  # in what directory to save computed matrix
+doSq = sys.argv[3]  # what distance and what power matrix to compute; options below
+# ('sq' - Euclidean squared, 'lin' - Euclidean linear, 'cosIfNormed' - cosine linear, 'cosSqIfNormed' - cosine squared)
+# (cosine options have 'IfNormed' suffix as they assume cluster centers given in checkpoint are normalized - which we do for ours)
 assert doSq in ('sq', 'lin', 'cosIfNormed', 'cosSqIfNormed')
 
 clustersFileExt = clustersFile.split('.')[-1]
