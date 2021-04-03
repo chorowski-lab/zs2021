@@ -13,9 +13,9 @@ class DSgetter:
         self.nameMustNotMatch = nameMustNotMatch
         self.reprSize = None
         self.files = []
-        self.sizes = []
+        #self.sizes = []
         self.where = {}
-        self.size = 0
+        #self.size = 0
         pattern = re.compile(nameMustMatch) if nameMustMatch is not None else None
         badPattern = re.compile(nameMustNotMatch) if nameMustNotMatch is not None else None
         random.seed(12345)
@@ -27,21 +27,21 @@ class DSgetter:
             if (nameMustMatch is None or pattern.match(name)) \
             and (nameMustNotMatch is None or not badPattern.match(name)): 
                 fn = os.path.join(p, name)
-                arr = self.getFromFileMethod(fn)  #np.genfromtxt(fn)
-                self.files.append((p, name, arr.shape[0]))
-                self.sizes.append(arr.shape[0])
+                #arr = self.getFromFileMethod(fn)  #np.genfromtxt(fn)
+                self.files.append((p, name)) #, arr.shape[0]))
+                #self.sizes.append(arr.shape[0])
                 assert name not in self.where
                 self.where[name] = len(self.files) - 1  # assumes names are directory-disjoint
-                self.size += arr.shape[0]
-                assert self.reprSize is None or self.reprSize == arr.shape[1]
-                self.reprSize = arr.shape[1]
-        print("Files in DS:", len(self.sizes))
-        assert self.reprSize is not None
+                #self.size += arr.shape[0]
+                #assert self.reprSize is None or self.reprSize == arr.shape[1]
+                #self.reprSize = arr.shape[1]
+        print("Files in DS:", len(self.files))
+        #assert self.reprSize is not None
 
     def getFromFile(self, fname):
         if fname not in self.where:
             return None
-        p,n,s = self.files[self.where[fname]]
+        p,n = self.files[self.where[fname]]
         return self.getFromFileMethod(os.path.join(p, n))
 
     def batchGenGen(self, filesInBatch=4):
@@ -54,11 +54,15 @@ class DSgetter:
             lengths = []
             size = 0
             for i in range(begin, min(begin + filesInBatch, len(self.files))):
-                p,n,s = self.files[i]
-                batch.append(self.getFromFileMethod(os.path.join(p, n)))
-                size += self.sizes[i]
+                p,n = self.files[i]
+                arr = self.getFromFileMethod(os.path.join(p, n))
+                if self.reprSize is None:
+                    self.reprSize = arr.shape[1]
+                assert self.reprSize == arr.shape[1]
+                batch.append(arr)
+                size += arr.shape[0]  #self.sizes[i]
                 names.append(n)
-                lengths.append(self.sizes[i])
+                lengths.append(arr.shape[0])  #self.sizes[i])
             batchnp = np.zeros((len(batch), max([l.shape[0] for l in batch]), self.reprSize))
             padMask = np.full((len(batch), max([l.shape[0] for l in batch])), False, dtype=bool)
             sumlen = 0
@@ -72,14 +76,13 @@ class DSgetter:
         arr = []
         i = 0
         cursize = 0
-        arr1 = None
+        p,n = self.files[i]
+        arr1 = self.getFromFileMethod(os.path.join(p, n))
         for num in choice:
-            while cursize + self.sizes[i] <= num:
-                cursize += self.sizes[i]
+            while cursize + arr1.shape[0] <= num:
+                cursize += arr1.shape[0]
                 i += 1
-                arr1 = None
-            if arr1 is None:
-                p,n,s = self.files[i]
+                p,n = self.files[i]
                 arr1 = self.getFromFileMethod(os.path.join(p, n))
             arr.append(arr1[num - cursize])
         return np.array(arr)
