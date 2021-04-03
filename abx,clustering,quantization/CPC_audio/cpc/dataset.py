@@ -91,7 +91,11 @@ class AudioBatchData(Dataset):
             del self.seqLabel
 
     def prepare(self):
+        randomstate = random.getstate()
+        random.seed(767543)  # set seed only for batching so that it is random but always same for same dataset
+                             # so that capturing captures data for same audio across runs if same dataset provided
         random.shuffle(self.seqNames)
+        random.setstate(randomstate)  # restore random state so that other stuff changes with seed in args
         start_time = time.time()
 
         print("Checking length...")
@@ -152,6 +156,11 @@ class AudioBatchData(Dataset):
         tmpData = []
 
         for speaker, seqName, seq in self.nextData:
+
+            # sometimes some data may be missing
+            if self.phoneLabelsDict is not None and seqName not in self.phoneLabelsDict:
+                continue
+            
             while self.speakers[indexSpeaker] < speaker:
                 indexSpeaker += 1
                 self.speakerLabel.append(speakerSize)
@@ -191,18 +200,20 @@ class AudioBatchData(Dataset):
             print(idx)
 
         outData = self.data[idx:(self.sizeWindow + idx)].view(1, -1)
-        label = torch.tensor(self.getSpeakerLabel(idx), dtype=torch.long)
+        labelData = {}
+        labelData['speaker'] = torch.tensor(self.getSpeakerLabel(idx), dtype=torch.long)
         if self.phoneSize > 0:
             label_phone = torch.tensor(self.getPhonem(idx), dtype=torch.long)
-            if not self.doubleLabels:
-                label = label_phone
-        else:
-            label_phone = torch.zeros(1)
+            labelData['phone'] = label_phone
+            # if not self.doubleLabels:
+            #     label = label_phone
+        # else:
+        #     label_phone = torch.zeros(1)
 
-        if self.doubleLabels:
-            return outData, label, label_phone
+        # if self.doubleLabels:
+        #     return outData, label, label_phone
 
-        return outData, label
+        return outData, labelData
 
     def getNSpeakers(self):
         return len(self.speakers)

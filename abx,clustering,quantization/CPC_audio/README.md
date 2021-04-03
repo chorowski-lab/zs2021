@@ -1,3 +1,12 @@
+this repo is based on `CPC_audio` (<https://github.com/facebookresearch/CPC_audio>) repo, but it also contains:
+- part of the code used for University of Wroclaw ZeroSpeech2021 submission (our modifications and also merged files from: <https://github.com/facebookresearch/CPC_audio/tree/zerospeech> - `criterion/clustering/`, <https://github.com/tuanh208/CPC_audio/tree/zerospeech> - `feature_loder.py -> buildFeature_batch`, <https://github.com/bootphon/zerospeech2021_baseline> - `scripts/`)
+- code used for CPC-CTC paper
+
+Below original README updated with some of our modifications; part of our code is also described in `cpc/README.md`.
+
+--------------------------------------------------------------------------------------------------
+
+
 # CPC_audio
 
 This code implements the Contrast Predictive Coding algorithm on audio data, as described in the paper [Unsupervised Pretraining Transfers well Across Languages](https://arxiv.org/abs/2002.02848). This is an unsupervised method to train audio features directly from the raw waveform.

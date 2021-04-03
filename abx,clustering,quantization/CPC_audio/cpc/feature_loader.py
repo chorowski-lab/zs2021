@@ -108,10 +108,13 @@ def getCheckpointData(pathDir):
         return None
     checkpoints.sort(key=lambda x: int(os.path.splitext(x[11:])[0]))
     data = os.path.join(pathDir, checkpoints[-1])
-    logs = None
-    if os.path.exists(os.path.join(pathDir, 'checkpoint_logs.json')):
+
+    logs = {}
+    try:
         with open(os.path.join(pathDir, 'checkpoint_logs.json'), 'rb') as file:
             logs = json.load(file)
+    except Exception as e:
+        print(f"WARNING: failed to load log: {e}")
 
     
     # args_json = os.path.join(pathDir, 'checkpoint_args.json')
@@ -166,7 +169,7 @@ def getAR(args):
     return arNet
 
 
-def loadModel(pathCheckpoints, loadStateDict=True, load_nullspace=False, updateConfig=None):
+def loadModel(pathCheckpoints, loadStateDict=True, load_nullspace=False, updateConfig=None, loadBestNotLast=False):
     models = []
     hiddenGar, hiddenEncoder = 0, 0
     for path in pathCheckpoints:
@@ -205,8 +208,12 @@ def loadModel(pathCheckpoints, loadStateDict=True, load_nullspace=False, updateC
                 m_ = CPCModelNullspace(m_, fake_nullspace)
                 hiddenGar -= locArgs.dim_inter
                 hiddenEncoder -= locArgs.dim_inter
+            if not loadBestNotLast:
+                m_.load_state_dict(state_dict["gEncoder"], strict=False)
+            else:
+                m_.load_state_dict(state_dict["best"], strict=False)
 
-            m_.load_state_dict(state_dict["gEncoder"], strict=False)
+
         if not doLoad:
             hiddenGar += locArgs.hiddenGar
             hiddenEncoder += locArgs.hiddenEncoder
