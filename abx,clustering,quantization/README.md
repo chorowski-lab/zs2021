@@ -55,23 +55,22 @@ This will leave produced embeddings under `$SAVE_DIR/reproduce_baseline_ABX_subm
 
 ```
 Usage: ./finetune_nullspace.sh
-        -d LIBRISPEECH_DATASET_PATH/train-clean-100 
-        -t LIBRISPEECH_TRAIN_CLEAN_100_TRAIN_SPLIT_FILE_PATH
-        -v LIBRISPEECH_TRAIN_CLEAN_100_TEST_SPLIT_FILE_PATH
+        -d DATASET_PATH (E.g. LIBRISPEECH_DATASET_PATH/train-clean-100)
+        -t TRAIN_SPLIT_FILE_PATH (E.g. LIBRISPEECH_TRAIN_CLEAN_100_TRAIN_SPLIT_FILE_PATH)
+        -v VALIDATION_SPLIT_FILE_PATH (E.g. LIBRISPEECH_TRAIN_CLEAN_100_TEST_SPLIT_FILE_PATH)
         -c BASELINE_NO_CLUSTERING_CHECKPOINT_PATH
         -o SAVE_DIR
         -n DIM_INBETWEEN (Dimension of nullspace will be DIM_EMBEDDING - DIM_INBETWEEN)
+        -p PHONEME_ALIGNMENTS_FILE (Path to the file containing phonemes for the entire dataset)
 OPTIONAL ARGS:
-        -s FROM_STEP (From which step do you want to start. Order: speakers_factorized [default] -> phonemes_nullspace -> speakers_nullspace)
-        -p PHONEME_ALIGNMENTS_FILE (Path to the file containing phonemes for the entire dataset. You don't need it if you start from speakers_nullspace)
-        -f AUDIO_FORMAT (audio files format in LibriSpeech dataset (without a dot))
+        -f FROM_STEP (From which step do you want to start. Order: speakers_factorized [default] -> phonemes_nullspace -> speakers_nullspace)
 ```
 In order to reproduce our experiment from the paper, run the following:
 
 ```bash
-for i in 256 320 416 448 464
+for DIM_NULLSPACE in 256 320 416 448 464
 do
-    ./finetune_nullspace.sh -d $LIBRISPEECH_DATASET_PATH/train-clean-100 -t $LIBRISPEECH_TRAIN_CLEAN_100_TRAIN_SPLIT_FILE_PATH -v $LIBRISPEECH_TRAIN_CLEAN_100_TEST_SPLIT_FILE_PATH -c $BASELINE_NO_CLUSTERING_CHECKPOINT_PATH -o $SAVE_DIR/nullspaces/$i -n $(expr 512 - $i) -p $PHONEME_ALIGNMENTS_FILE -f flac
+    ./finetune_nullspace.sh -d $LIBRISPEECH_DATASET_PATH/train-clean-100 -t $LIBRISPEECH_TRAIN_CLEAN_100_TRAIN_SPLIT_FILE_PATH -v $LIBRISPEECH_TRAIN_CLEAN_100_TEST_SPLIT_FILE_PATH -c $BASELINE_NO_CLUSTERING_CHECKPOINT_PATH -o $SAVE_DIR/nullspaces/$DIM_NULLSPACE -n $(expr 512 - $DIM_NULLSPACE) -p $PHONEME_ALIGNMENTS_FILE
 done
 ```
 
@@ -81,24 +80,17 @@ This will leave its results in subfolder(s) under $SAVE_DIR
 ### Evaluating ABX for nullspace
 
 1. Create the flattened version of LibriSpeech dev/test dataset. Once you have done this you do not have to do it anymore:
-```bash
-for directory in dev-clean dev-other test-clean test-other
-do
-  mkdir -p $LIBRISPEECH_FLATTENED_DATASET_PATH/phonetic/$directory
-  cp $LIBRISPEECH_DATASET_PATH/$directory/*/*/*.flac $LIBRISPEECH_FLATTENED_DATASET_PATH/phonetic/$directory
-done
 
-for directory in dev-clean dev-other
-do
-  cp $ZEROSPEECH_DATASET_PATH/phonetic/$directory/$directory.item $LIBRISPEECH_FLATTENED_DATASET_PATH/phonetic/$directory
-done
+```bash
+python scripts/create_ls_dataset_for_abx_eval.py $LIBRISPEECH_DATASET_PATH $ZEROSPEECH_DATASET_PATH $LIBRISPEECH_FLATTENED_DATASET_PATH
 ```
+
 2. Complete "Nullspace experiments" section
 3. Run `scripts/eval_abx.sh` from `CPC_audio` directory (it activates needed envs passed as arguments):
 
 ```
 Usage: scripts/eval_abx.sh
-        -d DATASET_PATH (Either ZEROSPEECH_DATASET_PATH or LIBRISPEECH_FLATTENED_DATASET_PATH)
+        -d DATASET_PATH (Either ZEROSPEECH_DATASET_PATH or LIBRISPEECH_FLATTENED_DATASET_PATH [Or anything that has directory structure of these two with dev-*.item files from ZEROSPEECH_DATASET_PATH])
         -r ZEROSPEECH_DATASET_PATH
         -c CHECKPOINT_PATH
         -o SAVE_DIR
@@ -108,19 +100,19 @@ OPTIONAL ARGS:
         -e CPC_ENVIRONMENT
         -z ZEROSPEECH_EVAL_ENVIRONMENT (The conda environment where the zerospeech2021-evaluate is installed)
         -t (Do not compute embeddings for test set)
-        -f AUDIO_FORMAT (audio files format in LibriSpeech dataset (without a dot))
 ```
 In order to reproduce ABX error rates for a CPC + nullspace, run the following (Note that LIBRISPEECH_FLATTENED_DATASET_PATH refers to the dateset created earlier and not to the path where LibriSpeech is located):
 
 ```bash
 #  --> provide chosen nullspace model that first needs to be produced like in "nullspace experiments" section as $CHECKPOINT_PATH
-#      those checkpoints should be under $SAVE_DIR/nullspaces/$(512-DIM_NULLSPACE)/(speakers_factorized OR phonemes_nullspace OR speakers_nullspace)_$(512-DIM_NULLSPACE)/checkpoint9.pt
-#      after "nullspace experiments" section; note that (speakers_factorized OR phonemes_nullspace OR speakers_nullspace) refers to different rows in ABX error rates table in the paper
+#      those checkpoints should be under $SAVE_DIR/nullspaces/$DIM_NULLSPACE/phonemes_nullspace_$(expr 512 - $DIM_NULLSPACE)/checkpoint9.pt
 
-scripts/eval_abx.sh -d $ZEROSPEECH_DATASET_PATH -r $ZEROSPEECH_DATASET_PATH -c $CHECKPOINT_PATH -o $SAVE_DIR/nullspace_abx_original -n -a $CONDA_PATH -e $CPC_ENVIRONMENT -z $ZEROSPEECH_EVAL_ENVIRONMENT -f wav
+for DIM_NULLSPACE in 256 320 416 448 464
+do
+    scripts/eval_abx.sh -d $ZEROSPEECH_DATASET_PATH -r $ZEROSPEECH_DATASET_PATH -c $SAVE_DIR/nullspaces/$DIM_NULLSPACE/phonemes_nullspace_$(expr 512 - $DIM_NULLSPACE)/checkpoint9.pt -o $SAVE_DIR/nullspaces/$DIM_NULLSPACE/abx/original -n -a $CONDA_PATH -e $CPC_ENVIRONMENT -z $ZEROSPEECH_EVAL_ENVIRONMENT
 
-scripts/eval_abx.sh -d $LIBRISPEECH_FLATTENED_DATASET_PATH -r $ZEROSPEECH_DATASET_PATH -c $CHECKPOINT_PATH -o $SAVE_DIR/nullspace_abx_librispeech -n -a $CONDA_PATH -e $CPC_ENVIRONMENT -z $ZEROSPEECH_EVAL_ENVIRONMENT -f flac
-
+    scripts/eval_abx.sh -d $LIBRISPEECH_FLATTENED_DATASET_PATH -r $ZEROSPEECH_DATASET_PATH -c $SAVE_DIR/nullspaces/$DIM_NULLSPACE/phonemes_nullspace_$(expr 512 - $DIM_NULLSPACE)/checkpoint9.pt -o $SAVE_DIR/nullspaces/$DIM_NULLSPACE/abx/librispeech -n -a $CONDA_PATH -e $CPC_ENVIRONMENT -z $ZEROSPEECH_EVAL_ENVIRONMENT
+done
 ```
 
 This will leave its results in subfolder(s) under $SAVE_DIR
