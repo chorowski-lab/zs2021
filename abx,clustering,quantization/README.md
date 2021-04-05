@@ -21,9 +21,9 @@ Names written as variables in capital letters are to be changed to user-specific
 1. Install conda; $CONDA_PATH will denote install path
 2. Download LibriSpeech dataset (in .flac format, otherwise need to change formats in later commands) and place under $LIBRISPEECH_DATASET_PATH
 3. Download ZeroSpeech2021 evaluation dataset (in .wav format) and place under $ZEROSPEECH_DATASET_PATH
-4. Setup `zerospeech2021` repo with its conda env (<https://github.com/bootphon/zerospeech2021>) according to its readme; $ZEROSPEECH_EVAL_ENVIRONMENT will denote env name
-5. Setup `zerospeech2021_baseline` repo with its conda env (<https://github.com/bootphon/zerospeech2021_baseline>) according to its readme (including downloading checkpoints) under $ZEROSPEECH2021_BASELINE_PATH
-6. Install `CPC_audio` repo snapshot provided in `CPC_audio` directory here with its conda env according to its readme; $CPC_ENVIRONMENT denotes the env path
+4. Setup `zerospeech2021` repo with its conda env (<https://github.com/bootphon/zerospeech2021>) according to its readme; $ZEROSPEECH_EVAL_ENVIRONMENT will denote env name (zerospeech2021 by default)
+5. Setup `zerospeech2021_baseline` repo with its conda env (<https://github.com/bootphon/zerospeech2021_baseline>) according to its readme (including downloading checkpoints) under $ZEROSPEECH2021_BASELINE_PATH; $ZEROSPEECH_BASELINE_ENVIRONMENT will denote env name (zerospeech2021_baseline by default)
+6. Install `CPC_audio` repo snapshot provided in `CPC_audio` directory here with its conda env according to its readme; $CPC_ENVIRONMENT denotes the env name (cpc_audio by default; please note you may need to change this before installation if you already have existing env with same name)
 7. Make a folder for saving results - $SAVE_DIR
 8. Create/download LibriSpeech train-clean-100 split into train and test sets saved in .txt files where each line contains name of file belonging in this split part (e.g. 7780-274562-0073 etc.); $LIBRISPEECH_TRAIN_CLEAN_100_TRAIN_SPLIT_FILE_PATH and $LIBRISPEECH_TRAIN_CLEAN_100_TRAIN_SPLIT_FILE_PATH will denote locations of those files
 9. Download phoneme alignments in correct format, which is linked in `CPC_audio` repo readme and place it under $PHONEME_ALIGNMENTS_FILE
@@ -37,12 +37,11 @@ We were only able to reproduce baseline results with following workflow:
  - compute other things on top of those
 which achieved better results in comparison to computing features for datasets used for ZeroSpeech phonetic metric evaluation. This can perhaps be because audio data in LibriSpeech tends to be consecutive and removing parts of it (some files, as in ZeroSpeech ABX-evaluation dataset) may harm autoregressive context (as `zerospeech2021_baseline/scripts/build_CPC_features.py` script we used for building features keeps autoregressive context between files as default, so removing some audio files was perhaps making high-level features out-of-date (by some files))
 
-1. Activate zerospeech2021_baseline conda env
-2. Run:
+1. Run (this will source conda and activate needed envs):
 ```bash
 ./reproduce_baseline_ABX.sh \
 $ZEROSPEECH2021_BASELINE_PATH $LIBRISPEECH_DATASET_PATH $ZEROSPEECH_DATASET_PATH \
-$SAVE_DIR
+$SAVE_DIR flac $CONDA_PATH $ZEROSPEECH_BASELINE_ENVIRONMENT $ZEROSPEECH_EVAL_ENVIRONMENT
 ```
 
 This will leave produced embeddings under `$SAVE_DIR/reproduce_baseline_ABX_submission/phonetic`.
