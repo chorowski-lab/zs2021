@@ -74,5 +74,6 @@ conda activate $ZSenv
 zerospeech2021-evaluate --force-cpu --no-lexical --no-syntactic --no-semantic -j 20 -o \
 $saveDir/reproduce_baseline_ABX_submission_eval $ZSdatasetDir $saveDir/reproduce_baseline_ABX_submission/
 
-
-conda activate $savedEnv
+if [ $savedEnv!=None ]; then
+  conda activate $savedEnv
+fi
