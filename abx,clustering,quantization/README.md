@@ -50,7 +50,8 @@ This will leave produced embeddings under `$SAVE_DIR/reproduce_baseline_ABX_subm
 ### Nullspace experiments
 
 1. Activate `CPC_audio` conda env
-2. Run `finetune_nullspace.sh` **from `CPC_audio` directory**:
+2. Navigate to `CPC_audio` directory
+3. Run `finetune_nullspace.sh` **from `CPC_audio` directory**:
 
 ```
 Usage: ./finetune_nullspace.sh
@@ -62,7 +63,8 @@ Usage: ./finetune_nullspace.sh
         -n DIM_INBETWEEN (Dimension of nullspace will be DIM_EMBEDDING - DIM_INBETWEEN)
         -p PHONEME_ALIGNMENTS_FILE (Path to the file containing phonemes for the entire dataset)
 OPTIONAL ARGS:
-        -f FROM_STEP (From which step do you want to start. Order: speakers_factorized [default] -> phonemes_nullspace -> speakers_nullspace)
+        -s FROM_STEP (From which step do you want to start. Order: speakers_factorized [default] -> phonemes_nullspace -> speakers_nullspace)
+        -f audio files format in LibriSpeech dataset (without a dot)
 ```
 In order to reproduce our experiment from the paper, run the following:
 
@@ -83,14 +85,16 @@ This will leave its results in subfolder(s) under $SAVE_DIR: checkpoints are und
 
 ### Evaluating ABX for nullspace
 
-1. Create the flattened version of LibriSpeech dev/test dataset. Once you have done this you do not have to do it anymore:
+1. Navigate to `CPC_audio` directory
+2. Create the flattened version of LibriSpeech dev/test dataset (will be created under `$LIBRISPEECH_FLATTENED_DATASET_PATH`). Once you have done this you do not have to do it anymore:
 
 ```bash
-python scripts/create_ls_dataset_for_abx_eval.py $LIBRISPEECH_DATASET_PATH $ZEROSPEECH_DATASET_PATH $LIBRISPEECH_FLATTENED_DATASET_PATH
+python scripts/create_ls_dataset_for_abx_eval.py $LIBRISPEECH_DATASET_PATH \
+$ZEROSPEECH_DATASET_PATH $LIBRISPEECH_FLATTENED_DATASET_PATH --file_extension flac
 ```
 
-2. Complete "Nullspace experiments" section
-3. Run `scripts/eval_abx.sh` from `CPC_audio` directory (it activates needed envs passed as arguments):
+3. Complete "Nullspace experiments" section
+4. Run `scripts/eval_abx.sh` from `CPC_audio` directory (it activates needed envs passed as arguments):
 
 ```
 Usage: scripts/eval_abx.sh
@@ -104,6 +108,7 @@ OPTIONAL ARGS:
         -e CPC_ENVIRONMENT
         -z ZEROSPEECH_EVAL_ENVIRONMENT (The conda environment where the zerospeech2021-evaluate is installed)
         -t (Do not compute embeddings for test set)
+        -f audio files format in LibriSpeech dataset (without a dot)
 ```
 In order to reproduce ABX error rates for a CPC + nullspace, run the following (Note that LIBRISPEECH_FLATTENED_DATASET_PATH refers to the dateset created earlier and not to the path where LibriSpeech is located):
 
@@ -112,12 +117,12 @@ In order to reproduce ABX error rates for a CPC + nullspace, run the following (
 for DIM_NULLSPACE in 256 320 416 448 464
 do
     scripts/eval_abx.sh -d $ZEROSPEECH_DATASET_PATH -r $ZEROSPEECH_DATASET_PATH \
-    -c $SAVE_DIR/nullspaces/$DIM_NULLSPACE/phonemes_nullspace_$(expr 512 - $DIM_NULLSPACE)/checkpoint9.pt \
+    -c $SAVE_DIR/nullspaces/$DIM_NULLSPACE/phonemes_nullspace_$(expr 512 - $DIM_NULLSPACE)/checkpoint_9.pt \
     -o $SAVE_DIR/nullspaces/$DIM_NULLSPACE/abx/original -n \
     -a $CONDA_PATH -e $CPC_ENVIRONMENT -z $ZEROSPEECH_EVAL_ENVIRONMENT -f wav
 
     scripts/eval_abx.sh -d $LIBRISPEECH_FLATTENED_DATASET_PATH -r $ZEROSPEECH_DATASET_PATH \
-    -c $SAVE_DIR/nullspaces/$DIM_NULLSPACE/phonemes_nullspace_$(expr 512 - $DIM_NULLSPACE)/checkpoint9.pt \
+    -c $SAVE_DIR/nullspaces/$DIM_NULLSPACE/phonemes_nullspace_$(expr 512 - $DIM_NULLSPACE)/checkpoint_9.pt \
     -o $SAVE_DIR/nullspaces/$DIM_NULLSPACE/abx/librispeech -n \
     -a $CONDA_PATH -e $CPC_ENVIRONMENT -z $ZEROSPEECH_EVAL_ENVIRONMENT -f flac
 done
@@ -133,7 +138,7 @@ This will leave its results in subfolder(s) under $SAVE_DIR
 3. For cosine k-means clustering and cosine-closest assignment quantizations run:
   ```bash
   #  --> provide chosen nullspace model that first needs to be produced like in "nullspace experiments" section as $NULLSPACE_MODEL_NO_CLUSTERING_CHECKPOINT_PATH
-  #      those checkpoints should be under $SAVE_DIR/nullspaces/$DIM_NULLSPACE/phonemes_nullspace_$(expr 512-$DIM_NULLSPACE)/checkpoint9.pt
+  #      those checkpoints should be under $SAVE_DIR/nullspaces/$DIM_NULLSPACE/phonemes_nullspace_$(expr 512-$DIM_NULLSPACE)/checkpoint_9.pt
   #      we used DIM_NULLSPACE 448 for clustering
 
   ./cluster_nullspace_cosine_and_quantize.sh \
@@ -143,7 +148,7 @@ This will leave its results in subfolder(s) under $SAVE_DIR
   For euclidean k-means clustering and euclidean-closest assignment quantizations run:
   ```bash
   #  --> provide chosen nullspace model that first needs to be produced like in "nullspace experiments" section as $NULLSPACE_MODEL_NO_CLUSTERING_CHECKPOINT_PATH
-  #      those checkpoints should be under $SAVE_DIR/nullspaces/$DIM_NULLSPACE/phonemes_nullspace_$(expr 512-$DIM_NULLSPACE)/checkpoint9.pt
+  #      those checkpoints should be under $SAVE_DIR/nullspaces/$DIM_NULLSPACE/phonemes_nullspace_$(expr 512-$DIM_NULLSPACE)/checkpoint_9.pt
   #      we used DIM_NULLSPACE 448 for clustering
 
   ./cluster_nullspace_euclidean_and_quantize.sh \
