@@ -22,11 +22,11 @@ def parse_args():
 def main():
     # Parse and print args
     args = parse_args()
-    logger.info(args)
+    #logger.info(args)
 
     phonetic = "phonetic"
     datasets = ["dev-clean", "dev-other", "test-clean", "test-other"]
- 
+
     for dataset in datasets:
         print("> {}".format(dataset))
         target_dirname = os.path.join(args.target_path, phonetic, dataset)
@@ -45,7 +45,7 @@ def main():
             source_item_path = os.path.join(args.zerospeech_dataset_path, phonetic, dataset, dataset + ".item")
             target_item_path = os.path.join(target_dirname, dataset + ".item")
             shutil.copy(source_item_path, target_item_path)
-            
+
 
 if __name__ == "__main__":
     #import ptvsd
@@ -53,4 +53,3 @@ if __name__ == "__main__":
     #print("Attach debugger now")
     #ptvsd.wait_for_attach()
     main()
-
