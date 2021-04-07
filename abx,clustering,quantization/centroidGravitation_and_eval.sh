@@ -24,9 +24,9 @@ processesToUse=20  # integer (e.g. 20) or cuda
 degList=$6  # list of push degrees as batch list, e.g. "0.2 0.3 0.4"
 
 closestClusterChoice=$7  # cosineclosest or euclideanclosest 
-if [ $closestClusterChoice==cosineclosest ]; then
+if [ $closestClusterChoice == "cosineclosest" ]; then
     closestClusterCosine=True
-elif [ $closestClusterChoice==euclideanclosest ]; then
+elif [ $closestClusterChoice == "euclideanclosest" ]; then
     closestClusterCosine=False
 else
     echo "invalid closestClusterChoice config choice; has to be cosineclosest or euclideanclosest"
@@ -34,9 +34,9 @@ else
 fi
 
 normalizeForPushChoice=$8  # normalizeforpush or dontnormalizeforpush  ; normalizing aims to approximate pushing part of cosine and not euclidean distance
-if [ $normalizeForPushChoice==normalizeforpush ]; then
+if [ $normalizeForPushChoice == "normalizeforpush" ]; then
     normalizeForPush=True
-elif [ $normalizeForPushChoice==dontnormalizeforpush ]; then
+elif [ $normalizeForPushChoice == "dontnormalizeforpush" ]; then
     normalizeForPush=False
 else
     echo "invalid normalizeForPushChoice config choice; has to be normalizeforpush or dontnormalizeforpush"

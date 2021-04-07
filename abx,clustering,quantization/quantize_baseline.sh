@@ -9,7 +9,7 @@ evalDSformat=$4  # wav; without dot
 saveThingsPath=$5
 
 # this is for already done baseline euclidean quantization and euclidean assignments
-normalizationSettingAssignment=nonormalize  # euclidean-closest cluster assignment
+normalizationSettingAssignment=dontnormalize  # euclidean-closest cluster assignment
 
 # this is for baseline checkpoint
 nullspaceTypeOfCheckpoint=nonullspace
@@ -19,11 +19,11 @@ baseModelCheckpoint=$6
 
 PREVIFS=$IFS
 
-# we didn't use option to discard context between files when processing evaluation set with e.g. word per file
-# hoping that maybe it will still be better than cold start
+# with batch set, context is not kept between the audio files
+# [!] in case of GPU overflow, change batch size below - after 2nd comma in each line below; for evalDS files in batch are smaller
 setsToProcess=\
-"${LibriSpeechPath}/LibriSpeech/train-clean-100,${saveThingsPath}/baseline_quantizations/LibriSpeech/train-clean-100,8,${LibriSpeechFormat} \
-${LibriSpeechPath}/LibriSpeech/train-full-960,${saveThingsPath}/baseline_quantizations/LibriSpeech/train-full-960,8,${LibriSpeechFormat} \
+"${LibriSpeechPath}/train-clean-100,${saveThingsPath}/baseline_quantizations/LibriSpeech/train-clean-100,8,${LibriSpeechFormat} \
+${LibriSpeechPath}/train-full-960,${saveThingsPath}/baseline_quantizations/LibriSpeech/train-full-960,8,${LibriSpeechFormat} \
 ${evalDSpath}/lexical/dev,${saveThingsPath}/baseline_quantizations/evalDS/lexical/dev,8,${evalDSformat} \
 ${evalDSpath}/lexical/test,${saveThingsPath}/baseline_quantizations/evalDS/lexical/test,8,${evalDSformat} \
 ${evalDSpath}/semantic/dev/librispeech,${saveThingsPath}/baseline_quantizations/evalDS/semantic/dev/librispeech,8,${evalDSformat} \

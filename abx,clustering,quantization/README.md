@@ -64,7 +64,7 @@ Usage: ./finetune_nullspace.sh
         -p PHONEME_ALIGNMENTS_FILE (Path to the file containing phonemes for the entire dataset)
 OPTIONAL ARGS:
         -s FROM_STEP (From which step do you want to start. Order: speakers_factorized [default] -> phonemes_nullspace -> speakers_nullspace)
-        -f audio files format in LibriSpeech dataset (without a dot)
+        -f audio files format in -d dataset (without a dot)
 ```
 In order to reproduce our experiment from the paper, run the following:
 
@@ -108,7 +108,7 @@ OPTIONAL ARGS:
         -e CPC_ENVIRONMENT
         -z ZEROSPEECH_EVAL_ENVIRONMENT (The conda environment where the zerospeech2021-evaluate is installed)
         -t (Do not compute embeddings for test set)
-        -f audio files format in LibriSpeech dataset (without a dot)
+        -f audio files format in -d dataset (without a dot)
 ```
 In order to reproduce ABX error rates for a CPC + nullspace, run the following (Note that LIBRISPEECH_FLATTENED_DATASET_PATH refers to the dateset created earlier and not to the path where LibriSpeech is located):
 
@@ -128,7 +128,7 @@ do
 done
 ```
 
-This will leave its results in subfolder(s) under $SAVE_DIR
+This will leave its results in subfolder(s) under `$SAVE_DIR/nullspaces/$DIM_NULLSPACE/abx/`.
 
 
 ### Performing k-means clustering on nullspace embeddings and producing quantizations:
@@ -155,8 +155,9 @@ This will leave its results in subfolder(s) under $SAVE_DIR
   $LIBRISPEECH_DATASET_PATH flac $ZEROSPEECH_DATASET_PATH wav \
   $SAVE_DIR $NULLSPACE_MODEL_NO_CLUSTERING_CHECKPOINT_PATH
   ```
+  **in case of GPU overflow, try to change batch size in scripts in commands above**
 
-This will leave its results in subfolder(s) under $SAVE_DIR
+This will leave its results in subfolder(s) under $SAVE_DIR: clusterings under `$SAVE_DIR/trained_nullspace_cosine_kmeans/` and `$SAVE_DIR/trained_nullspace_euclidean_kmeans/`, and quantizations under `$SAVE_DIR/nullspace_cosine_cosine_quantizations` and `$SAVE_DIR/nullspace_euclidean_euclidean_quantizations`.
 
 
 ### Producing baseline quantizations
@@ -169,8 +170,9 @@ This will leave its results in subfolder(s) under $SAVE_DIR
   ./quantize_baseline.sh $LIBRISPEECH_DATASET_PATH flac $ZEROSPEECH_DATASET_PATH wav \
   $SAVE_DIR $BASELINE_KMEANS50BIG_CHECKPOINT_PATH
   ```
+  **in case of GPU overflow, try to change batch size in script in command above**
 
-This will leave its results in subfolder(s) under $SAVE_DIR
+This will leave its results in subfolder(s) under `$SAVE_DIR/baseline_quantizations`.
 
 
 ### Centroid-gravitation for ABX

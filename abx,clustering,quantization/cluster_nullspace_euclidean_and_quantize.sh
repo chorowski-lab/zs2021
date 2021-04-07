@@ -29,11 +29,11 @@ $LibriSpeechFormat
 
 PREVIFS=$IFS
 
-# we didn't use option to discard context between files when processing evaluation set with e.g. word per file
-# hoping that maybe it will still be better than cold start
+# with batch set, context is not kept between the audio files
+# [!] in case of GPU overflow, change batch size below - after 2nd comma in each line below; for evalDS files in batch are smaller
 setsToProcess=\
-"${LibriSpeechPath}/LibriSpeech/train-clean-100,${saveThingsPath}/nullspace_euclidean_euclidean_quantizations/LibriSpeech/train-clean-100,32,${LibriSpeechFormat} \
-${LibriSpeechPath}/LibriSpeech/train-full-960,${saveThingsPath}/nullspace_euclidean_euclidean_quantizations/LibriSpeech/train-full-960,32,${LibriSpeechFormat} \
+"${LibriSpeechPath}/train-clean-100,${saveThingsPath}/nullspace_euclidean_euclidean_quantizations/LibriSpeech/train-clean-100,32,${LibriSpeechFormat} \
+${LibriSpeechPath}/train-full-960,${saveThingsPath}/nullspace_euclidean_euclidean_quantizations/LibriSpeech/train-full-960,32,${LibriSpeechFormat} \
 ${evalDSpath}/lexical/dev,${saveThingsPath}/nullspace_euclidean_euclidean_quantizations/evalDS/lexical/dev,128,${evalDSformat} \
 ${evalDSpath}/lexical/test,${saveThingsPath}/nullspace_euclidean_euclidean_quantizations/evalDS/lexical/test,128,${evalDSformat} \
 ${evalDSpath}/semantic/dev/librispeech,${saveThingsPath}/nullspace_euclidean_euclidean_quantizations/evalDS/semantic/dev/librispeech,128,${evalDSformat} \

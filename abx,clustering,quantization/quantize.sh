@@ -6,10 +6,10 @@ savePath=$3  # /pio/gluster/i283340/cosine_clusters_cosine_assignments/lexical/d
 bsize=$4
 fileExt=$5
 
-nullspaceTypeOfCheckpoint=$6  # nullspace or nonullspace 
-if [ $nullspaceTypeOfCheckpoint==nullspace ]; then
+nullspaceTypeOfCheckpoint=$6  # nullspace or nonullspace echo $nullspaceTypeOfCheckpoint
+if [ $nullspaceTypeOfCheckpoint == "nullspace" ]; then
     nullspaceFlag=--nullspace
-elif [ $nullspaceTypeOfCheckpoint==nonullspace ]; then
+elif [ $nullspaceTypeOfCheckpoint == "nonullspace" ]; then
     nullspaceFlag=
 else
     echo "invalid nullspace config choice; has to be nullspace or nonullspace"
@@ -17,9 +17,9 @@ else
 fi
 
 normalizationSetting=$7  # normalize or dontnormalize 
-if [ $normalizationSetting==normalize ]; then
+if [ $normalizationSetting == "normalize" ]; then
     normalizationFlag=--norm_vec_len
-elif [ $normalizationSetting==dontnormalize ]; then
+elif [ $normalizationSetting == "dontnormalize" ]; then
     normalizationFlag=
 else
     echo "invalid normalize config choice; has to be normalize or dontnormalize"
