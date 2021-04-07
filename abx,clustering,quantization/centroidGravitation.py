@@ -149,17 +149,17 @@ if __name__ == '__main__':
     poolSettings = sys.argv[6]
     
     #justCpy = sys.argv[7]
-    degs = list(map(lambda x: (float(x), x), sys.argv[8].split(':')))
+    degs = list(map(lambda x: (float(x), x), sys.argv[7].split(':')))
     print(degs)
     
     # makes dists cosine
-    doNorm = True if sys.argv[9] in ("True", "true") else False  
+    doNorm = True if sys.argv[8] in ("True", "true") else False  
     
     # approximation of pushing %age of cosine and not euclid dist
     # the bigger the angle the worse approximation and less pushing
     # could also solve some equation for actual %age of angle, but this is possible future TODO
     # without doNormForPush pushing is euclidean and results in smaller-angle push for euclid-further points
-    doNormForPush = True if sys.argv[10] in ("True", "true") else False
+    doNormForPush = True if sys.argv[9] in ("True", "true") else False
     print(f"Norm: {doNorm}, doNormForPush: {doNormForPush}")    
     
     clustersFileExt = clustersFile.split('.')[-1]

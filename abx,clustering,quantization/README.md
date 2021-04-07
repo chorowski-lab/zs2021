@@ -196,6 +196,9 @@ This will leave its results in subfolder(s) under $SAVE_DIR
 
 For example to reproduce centroid-gravitation results from the table in ZeroSpeech submission paper (SAVE_DIR is one used for performing k-means clustering on nullspace embeddings as above):
 ```bash
+
+# ZEROSPEECH_NULLSPACE_PHONETIC_EMBEDDINGS_ROOT=$SAVE_DIR/nullspaces/448/abx/librispeech/embeddings/phonemes_nullspace_64/phonetic/
+
 # nullspace/cosine/cosine
 ./centroidGravitation_and_eval_embeddings.sh \
 $ZEROSPEECH_NULLSPACE_PHONETIC_EMBEDDINGS_ROOT \
@@ -278,8 +281,8 @@ In order to reproduce centroid-gravitation phoneme classification accuracy resul
 
 1. Complete "Nullspace experiments" section
 2. Complete "Performing k-means clustering on nullspace embeddings and producing quantizations" section
-3. Activate `CPC_audio` env
-4. For no-nullspace phoneme classification with centroid-gravitation (Euclidean K-Means, Euclidean-closest cluster assignment) run:
+3. Activate `CPC_audio` env (but don't enter `CPC_audio` dir, run below from this folder)
+4. For no-nullspace phoneme classification with centroid-gravitation (Euclidean K-Means, Euclidean-closest cluster assignment) run: // requires LibriSpeech in .flac
 ```bash
 # --> set $BASELINE_NO_CLUSTERING_CHECKPOINT_PATH as the path to CPC-big checkpoint without clustering data under $ZEROSPEECH2021_BASELINE_PATH/checkpoints
 # --> set $BASELINE_KMEANS50BIG_CHECKPOINT_PATH as the path to CPC-big k-means checkpoint under $ZEROSPEECH2021_BASELINE_PATH/checkpoints
@@ -287,14 +290,14 @@ In order to reproduce centroid-gravitation phoneme classification accuracy resul
 ./centroidGravitation_nonullspace_phoneme_classification.sh \
 $LIBRISPEECH_DATASET_PATH \
 $LIBRISPEECH_TRAIN_CLEAN_100_TRAIN_SPLIT_FILE_PATH \
-$LIBRISPEECH_TEST_CLEAN_100_TRAIN_SPLIT_FILE_PATH \
+$LIBRISPEECH_TRAIN_CLEAN_100_TEST_SPLIT_FILE_PATH \
 $BASELINE_NO_CLUSTERING_CHECKPOINT_PATH \
 $BASELINE_KMEANS50BIG_CHECKPOINT_PATH \
 $PHONEME_ALIGNMENTS_FILE \
 $SAVE_DIR
 ```
 
-For nullspace phoneme classification with centroid-gravitation (Euclidean K-Means, Euclidean-closest cluster assignment) run:
+For nullspace phoneme classification with centroid-gravitation (Euclidean K-Means, Euclidean-closest cluster assignment) run: // requires LibriSpeech in .flac
 
 ```bash
 # --> set $BASELINE_NO_CLUSTERING_CHECKPOINT_PATH as the path to CPC-big checkpoint without clustering data under $ZEROSPEECH2021_BASELINE_PATH/checkpoints
@@ -302,12 +305,13 @@ For nullspace phoneme classification with centroid-gravitation (Euclidean K-Mean
 ./centroidGravitation_nullspace_phoneme_classification.sh \
 $LIBRISPEECH_DATASET_PATH \
 $LIBRISPEECH_TRAIN_CLEAN_100_TRAIN_SPLIT_FILE_PATH \
-$LIBRISPEECH_TEST_CLEAN_100_TRAIN_SPLIT_FILE_PATH \
+$LIBRISPEECH_TRAIN_CLEAN_100_TEST_SPLIT_FILE_PATH \
 $BASELINE_NO_CLUSTERING_CHECKPOINT_PATH \
-$SAVE_DIR/trained_nullspace_euclidean_kmeans/kmeans50checkpoint.pt
-$SAVE_DIR/nullspaces/448/speakers_factorized_64/checkpoint9.pt \
+$SAVE_DIR/trained_nullspace_euclidean_kmeans/kmeans50checkpoint.pt \
+$SAVE_DIR/nullspaces/448/speakers_factorized_64/checkpoint_9.pt \
 $PHONEME_ALIGNMENTS_FILE \
 $SAVE_DIR
+# that script assumes 448/64 nullspace dim
 
 ```
 

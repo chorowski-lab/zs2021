@@ -12,7 +12,7 @@ for deg in 0 0.2 0.3 0.4 0.5 0.6 0.7
 do
     echo $deg
     mkdir $saveDir/phoneme_classif_nonull_${deg}/
-    python cpc/eval/linear_separability.py $LibriSpeechDir/train-clean-100/ \
+    python CPC_audio/cpc/eval/linear_separability.py $LibriSpeechDir/train-clean-100/ \
     $LStrainLabelsFile \
     $LStestLabelsFile \
     $noClusteringNoNullspaceCheckpointPath \

@@ -19,4 +19,4 @@ elif clustersFileExt == 'pt':
 centersLengths = torch.sqrt((centers*centers).sum(1))
 print(centersLengths)
 print(str([(centers[i].min().item(), centers[i].max().item()) for i in range(centers.shape[0])]))
-#print(centers[1])
+print("centers shape:", centers.shape)
