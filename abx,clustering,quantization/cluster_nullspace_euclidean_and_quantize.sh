@@ -2,10 +2,10 @@
 
 
 
-LibriSpeechPath=$1  # /pio/data/zerospeech2021/LibriSpeech
-LibriSpeechFormat=$2  # flac; without dot
-evalDSpath=$3   # /pio/data/zerospeech2021/dataset/
-evalDSformat=$4  # wav; without dot
+LibriSpeechPath=$1
+LibriSpeechFormat=$2  # e.g. flac; without dot
+evalDSpath=$3
+evalDSformat=$4  # e.g. wav; without dot
 saveThingsPath=$5
 
 # this is for euclidean quantization and euclidean assignments

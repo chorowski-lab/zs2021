@@ -2,9 +2,9 @@
 # cos clustering, cos assignment, nullspace
 
 
-clustersCheckpoint=$1  # /pio/gluster/i283340/cosine_quant/nullspace64trainedLStrain-clean-100/trained50clusters.pt
+clustersCheckpoint=$1
 
-saveSubmissionRoot=$2  # /pio/gluster/i283340/subms_nullClean/subm_nullspaceCosClustCosAssign
+saveSubmissionRoot=$2
 # saves files with modified embeddings under there, more in the next param below; those files can be later copied to actual submission
 
 inOutSubsetsDescr=$3  # this is in the following format:
@@ -13,10 +13,10 @@ inOutSubsetsDescr=$3  # this is in the following format:
 # b = path_to_directory_with_saved_embeddings_for_this_subset  (those also need to be in the .txt format)
 # example:  dev-clean{}../null-features/phonetic/dev-clean:dev-other{}../null-features/phonetic/dev-other
 
-metaFileToUse=$4  # /pio/gluster/i283340/subms_null/subm_nullspaceCosClustCosAssign_deg0-6/meta.yaml
+metaFileToUse=$4
 # this is copied to created submission dir in order to automatically run phonetic evaluation afterwards
 
-phoneticEvalDSpath=$5  # /pio/scratch/1/i283340/MGR/zs/quantization/ls-ds-dev/
+phoneticEvalDSpath=$5
 
 batchSize=32  # integer, e.g. 32
 processesToUse=20  # integer (e.g. 20) or cuda

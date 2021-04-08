@@ -178,9 +178,7 @@ if __name__ == '__main__':
         pool = multiprocessing.Pool(int(poolSettings))
     else:
         centers = centers.cuda()  
-        # GPU option is highly unoptimized collating lengths of all lines in batch to longest file
-        # and doing much unnecessary computation therefore
-        # we actually used CPU option
+        # we actually used CPU option, GPU one is not well tested
 
     for deg, degString in degs:
 

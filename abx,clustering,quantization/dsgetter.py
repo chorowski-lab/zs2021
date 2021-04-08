@@ -21,22 +21,17 @@ class DSgetter:
         random.seed(12345)
         walk = list([(a,b,d) for a,b,c in os.walk(path) for d in c])  #list(os.walk(path))
         random.shuffle(walk)  # same random shuffling
-        #for p,sd,f in walk: #sorted(os.walk(path)): #scandir(sys.argv[1]):
-        #    for name in sorted(f):
+
         for p, sd, name in walk:
             if (nameMustMatch is None or pattern.match(name)) \
             and (nameMustNotMatch is None or not badPattern.match(name)): 
                 fn = os.path.join(p, name)
-                #arr = self.getFromFileMethod(fn)  #np.genfromtxt(fn)
                 self.files.append((p, name)) #, arr.shape[0]))
-                #self.sizes.append(arr.shape[0])
                 assert name not in self.where
                 self.where[name] = len(self.files) - 1  # assumes names are directory-disjoint
-                #self.size += arr.shape[0]
-                #assert self.reprSize is None or self.reprSize == arr.shape[1]
-                #self.reprSize = arr.shape[1]
+            
         print("Files in DS:", len(self.files))
-        #assert self.reprSize is not None
+        
 
     def getFromFile(self, fname):
         if fname not in self.where:

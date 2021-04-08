@@ -1,11 +1,10 @@
 echo "List: $3"
-#x=(a b)
-#for item in "${x[@]}" ; do
+
 baseSubmPath=$1
 baseOutputPath=$2
 datasetDir=$4
 outFile=$5
-for item in $3 ; do  # passing list args:   "arg1_subarg1 arg1_subarg2"
+for item in $3 ; do  # passing list args:   "a b c"
     submDir="${baseSubmPath}${item}"
     outputDir="${baseOutputPath}${item}"
     echo $submDir

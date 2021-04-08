@@ -3,13 +3,10 @@
 
 import sys
 import os
-from shutil import copyfile
+
 
 dsRoot = sys.argv[1]
 submRoot = sys.argv[2]
-#newSubmRoot = sys.argv[3]
-#metadataFileToCpy = sys.argv[4]
-
 
 
 sDevClean = set()

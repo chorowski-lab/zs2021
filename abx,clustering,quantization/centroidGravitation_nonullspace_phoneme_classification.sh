@@ -1,11 +1,11 @@
 
 
 LibriSpeechDir=$1
-LStrainLabelsFile=$2  # zd/LibriSpeech/labels_split/train_split_100.txt
-LStestLabelsFile=$3  #zd/LibriSpeech/labels_split/test_split_100.txt
-noClusteringNoNullspaceCheckpointPath=$4  # $zd/checkpoints/CPC-big-kmeans50/cpc_ll6k/checkpoint_32.pt
-clusteringNoNullspaceCheckpointPath=$5  # $zd/checkpoints/CPC-big-kmeans50/clustering_kmeans50/clustering_CPC_big_kmeans50.pt
-phoneAlignmentsFile=$6  # $zd/LibriSpeech/alignments2/converted_aligned_phones.txt
+LStrainLabelsFile=$2
+LStestLabelsFile=$3
+noClusteringNoNullspaceCheckpointPath=$4
+clusteringNoNullspaceCheckpointPath=$5
+phoneAlignmentsFile=$6
 saveDir=$7
 
 for deg in 0 0.2 0.3 0.4 0.5 0.6 0.7

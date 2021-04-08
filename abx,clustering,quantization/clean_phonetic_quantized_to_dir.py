@@ -3,9 +3,8 @@
 
 import sys
 import os
-from shutil import copyfile
 
-# example:  python clean_phonetic_quantized_to_dir.py /pio/data/zerospeech2021/dataset/phonetic/dev-clean ../quantizedtoomuch ../quantizedcleanout quantized_outputs.txt
+# example:  python clean_phonetic_quantized_to_dir.py /datasetdir/zerospeech2021/dataset/phonetic/dev-clean ../quantizedtoomuch ../quantizedcleanout quantized_outputs.txt
 
 dsRoot = sys.argv[1]  # data files need to be flat just under here
 quantizedRoot = sys.argv[2]  # quantizedFName needs to be just there

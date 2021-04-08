@@ -2,7 +2,7 @@
 
 embeddingsRoot=$1  # assuming will contain dev/test-clean/other subdirs underneath
 
-clustersCheckpoint=$2  # /pio/gluster/i283340/cosine_quant/nullspace64trainedLStrain-clean-100/trained50clusters.pt
+clustersCheckpoint=$2
 
 saveSubmissionsRoot=$3
 

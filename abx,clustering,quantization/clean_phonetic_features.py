@@ -3,13 +3,11 @@
 
 import sys
 import os
-from shutil import copyfile
 
-# example:  python clean_phonetic_features_to_dir.py /pio/data/zerospeech2021/dataset/phonetic/dev-clean ../features_lvl2_all-ls_devclean/ ../features_lvl2_all-ls_devclean_zscleaned/
+# example:  python clean_phonetic_features_to_dir.py /datasetdir/zerospeech2021/dataset/phonetic/dev-clean ../features_lvl2_all-ls_devclean/
 
 dsRoot = sys.argv[1]  # data files need to be flat just under here
 featureRoot = sys.argv[2]  # feature files need to be flat just under here
-#newFeatureRoot = sys.argv[3]
 
 DSfileset = set()
 

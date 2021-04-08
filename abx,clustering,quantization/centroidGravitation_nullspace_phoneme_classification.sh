@@ -1,11 +1,11 @@
 
 LibriSpeechDir=$1
-LStrainLabelsFile=$2  # zd/LibriSpeech/labels_split/train_split_100.txt
-LStestLabelsFile=$3  #zd/LibriSpeech/labels_split/test_split_100.txt
-noClusteringNoNullspaceCheckpointPath=$4  # $zd/checkpoints/CPC-big-kmeans50/cpc_ll6k/checkpoint_32.pt
-clusteringNullspaceCheckpointPath=$5  #  $cpcClustDir/checkpoints/clustering_CPC_big_kmeans50_nullspace_64/clustering_CPC_big_kmeans50_nullspace_64.pt
-nullspaceSpeakersFactorizedCheckpointPath=$6  # $nullspaceDir/linear_separability/cpc/gru_level2/cpc_official_speakers_factorized_64/checkpoint_9.pt
-phoneAlignmentsFile=$7  # $zd/LibriSpeech/alignments2/converted_aligned_phones.txt
+LStrainLabelsFile=$2
+LStestLabelsFile=$3
+noClusteringNoNullspaceCheckpointPath=$4
+clusteringNullspaceCheckpointPath=$5
+nullspaceSpeakersFactorizedCheckpointPath=$6
+phoneAlignmentsFile=$7
 saveDir=$8
 
 

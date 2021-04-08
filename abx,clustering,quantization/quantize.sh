@@ -1,8 +1,8 @@
 
 
-clusteringCheckpoint=$1  # /pio/gluster/i283340/cosine_quant/nullspace64trainedLStrain-clean-100/trained50clusters.pt
-DSpath=$2  # /pio/data/zerospeech2021/dataset/lexical/dev
-savePath=$3  # /pio/gluster/i283340/cosine_clusters_cosine_assignments/lexical/dev/
+clusteringCheckpoint=$1
+DSpath=$2
+savePath=$3
 bsize=$4
 fileExt=$5
 
