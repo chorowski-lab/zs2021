@@ -192,7 +192,7 @@ $CLOSEST_CLUSTER_CHOICE_METHOD \
 $NORMALIZE_FOR_PUSH_CHOICE
 ```
 
-This will leave its results in subfolder(s) under $SAVE_DIR
+This will leave its results in subfolder(s) in chosen place under `$SAVE_DIR`, e.g. under `$SAVE_DIR/centroid-gravitation-abx-eval` for config below.
 
 For example to reproduce centroid-gravitation results from the table in ZeroSpeech submission paper (SAVE_DIR is one used for performing k-means clustering on nullspace embeddings as above):
 ```bash
@@ -315,11 +315,15 @@ $SAVE_DIR
 
 ```
 
+Those will leave their results under `$SAVE_DIR/centroid_gravitation_phoneme_classif`.
+
+
 ### Producing cluster distance matrix for sWUGGY
 
 1. Complete "Nullspace experiments" section
 2. Complete "Performing k-means clustering on nullspace embeddings and producing quantizations" section
-3. Use `dist_matrix_from_clusters.py` script with chosen config (described in the script)
-4. Compute chosen power of the matrix if not linear or squared (options provided in the script)
+3. Activate `zerospeech2021` env (or other with pytorch and numpy)
+4. Use `dist_matrix_from_clusters.py` script with chosen config (described in the script)
+5. Compute chosen power of the matrix if not linear or squared (options provided in the script)
 
 
