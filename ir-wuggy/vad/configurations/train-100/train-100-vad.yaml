@@ -1,0 +1,4 @@
+audioPath: /pio/data/zerospeech2021/LibriSpeech/train-clean-100
+quantPath: /pio/data/zerospeech2021/quantized/LibriSpeech/train-clean-100
+outPath: /pio/data/zerospeech2021/quantized_vad/LibriSpeech/train-clean-100/split
+method: split
